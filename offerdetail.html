@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offer Details</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f4f9;
+      margin: 20px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header Section */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 18px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .header-actions button, .header-actions select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #0066cc;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .header-actions button:hover {
+      background-color: #4e4bdf;
+    }
+
+    /* Summary Info */
+    .summary {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      background-color: #f8f8fc;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .summary-item {
+      text-align: center;
+    }
+
+    .summary-item strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    /* Filters and Details */
+    .filters {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f8fc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .filters span {
+      margin-right: 15px;
+    }
+
+    .filters select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    /* Data Table */
+    table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    table th, table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    table th {
+      background-color: #f0f4ff;
+      font-weight: bold;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    .warning-cell {
+      background-color: #ffeeba;
+      color: #856404;
+    }
+	.btn-primary {
+		background: #0066cc;
+		color: white;
+		border: 2px solid #0066cc;
+		padding: 10px 20px;
+		border-radius: 6px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+		text-decoration: none;
+		font-size: 14px;
+	}
+
+	.header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+  </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()">
+                ← Back to Dashboard
+            </button>
+        </div>
+	</div>
+  <div class="container">
+    <!-- Header Section -->
+    <div class="header">
+      <h1>D857 ELAN ATS NOV NC-12-06</h1>
+      <div class="header-actions ">
+        <select>
+          <option>In Progress</option>
+          <option>Negotiation</option>
+        </select>
+        <button class="btn-primary" >Download</button>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary">
+      <div class="summary-item">
+        <strong>Total Cost</strong>
+        $42,394.75
+      </div>
+      <div class="summary-item">
+        <strong>Commitment Due Date</strong>
+        24-Aug-2024
+      </div>
+      <div class="summary-item">
+        <strong>EDI Due Date</strong>
+        24-Aug-2024
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters">
+      <span>Exact Matches: 11</span>
+      <span>Partial Matches: 1</span>
+      <span>No Matches: 0</span>
+    </div>
+
+    <!-- Table Section -->
+    <table>
+      <thead>
+        <tr>
+			<th>VPN #</th>
+			<th>Deliveries</th>
+          <th>Start Ship Date</th>
+          <th>Intended Month</th>
+          <th>Season</th>
+          <th>Description</th>
+          <th>Corporate Cluster</th>
+          <th>XS</th>
+          <th>S</th>
+          <th>M</th>
+          <th>L</th>
+          <th>XL</th>
+          <th>O/S</th>
+          <th>Bulk Units</th>
+          <th>Total Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>RG5014</td>
+		  <td>2</td>
+          <td>12/11/2025</td>
+          <td>12/25</td>
+          <td>Winter</td>
+          <td>MAXI DEEP V WRAP FRONT</td>
+          <td>A, B, C, D</td>
+          <td>0</td>
+          <td>280</td>
+          <td>214</td>
+          <td>140</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="warning-cell">634</td>
+          <td>$8,717.50</td>
+        </tr>
+        <tr>
+          <td>RY5015</td>
+		  <td>2</td>
+          <td>09/02/2025</td>
+          <td>09/25</td>
+          <td>Fall</td>
+          <td>MAXI DEEP V WRAP FRONT</td>
+          <td>A, B, C, D</td>
+          <td>110</td>
+          <td>110</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="warning-cell">220</td>
+          <td>$8765.00</td>
+        </tr>
+        <!-- Add more rows as required -->
+      </tbody>
+    </table>
+  </div>
+    <script>
+	 function goBack() {
+            window.history.back();
+        }
+	</script>
+</body>
+</html>

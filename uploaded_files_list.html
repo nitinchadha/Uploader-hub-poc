@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Files - File Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #0066cc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #f0f7ff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #0066cc;
+            border: 2px solid #0066cc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-outline:hover {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+            border: 2px solid #0066cc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+            border-color: #0052a3;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stats-text {
+            color: #0c5460;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .filters-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .status-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .status-tab {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .status-tab.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+        }
+
+        .status-tab:hover {
+            color: #0066cc;
+            background: #f8f9fa;
+        }
+
+        .files-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .table-header-row {
+            display: grid;
+            grid-template-columns: 40px 300px 120px 120px 100px 120px 150px 120px 120px 1fr;
+            gap: 16px;
+            padding: 16px 20px;
+            align-items: center;
+        }
+
+        .table-header-cell {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sortable {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sortable:hover {
+            color: #0066cc;
+        }
+
+        .table-body {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 40px 300px 120px 120px 100px 120px 150px 120px 120px 1fr;
+            gap: 16px;
+            padding: 16px 20px;
+            align-items: center;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.2s;
+        }
+
+        .table-row:hover {
+            background: #f8f9fa;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .row-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            background: #28a745;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .target-app {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .file-size {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-processing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .records-count {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .date-cell {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .uploaded-by {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #0066cc;
+            color: #0066cc;
+        }
+
+        .download-btn {
+            color: #28a745;
+            border-color: #28a745;
+        }
+
+        .download-btn:hover {
+            background: #28a745;
+            color: white;
+        }
+
+
+		
+		.detail-btn {
+            color: #3592dc;
+            border-color: #3592dc;
+        }
+		
+		.detail-btn:hover {
+            background: #3592dc;
+            color: white;
+        }
+
+        .delete-btn {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+		
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 60px;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            transition: width 0.3s ease;
+        }
+
+        .error-message {
+            font-size: 11px;
+            color: #dc3545;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 1200px) {
+            .table-header-row,
+            .table-row {
+                grid-template-columns: 40px 250px 100px 100px 80px 100px 120px 100px 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header-row,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .table-header-cell,
+            .table-row > div {
+                display: flex;
+                justify-content: space-between;
+                padding: 4px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()">
+                ← Back to Dashboard
+            </button>
+        </div>
+        <div class="header-actions">
+            <a href="#" class="btn-outline">Download Template</a>
+            <a href="#" class="btn-primary" onclick="goToUploader()">Upload Files</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Uploaded Files</h1>
+            <p class="page-subtitle">Manage and monitor all uploaded Excel files and their processing status</p>
+            
+            <div class="stats-bar">
+                <span class="stats-text">Total Files: 24 | Processing: 3 | Completed: 18 | Failed: 2 | Pending: 1</span>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <h3 class="filters-title">Quick Filters</h3>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label class="filter-label">Target App</label>
+                    <select class="filter-select" id="appFilter">
+                         <option value="">Select target application...</option>
+                        <option value="psa">PSA (Closeout)</option>
+                        <option value="multi-sku">PSA (Multi-SKU Marketplace)</option>
+						<option value="multi-sku">PSA (Toolio)</option>
+						<option value="item-hub">Item Maintenace</option>
+                        <option value="isu">ISU</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Uploaded By</label>
+                    <select class="filter-select" id="userFilter">
+                        <option value="">All Users</option>
+                        <option value="nitin.chadha">Nitin Chadha</option>
+						<option value="john.doe">John Doe</option>
+                        <option value="jane.smith">Jane Smith</option>
+                        <option value="mike.johnson">Mike Johnson</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <select class="filter-select" id="dateFilter">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-tabs">
+            <button class="status-tab active" onclick="filterByStatus('all')">All Files</button>
+            <button class="status-tab" onclick="filterByStatus('processing')">Processing (3)</button>
+            <button class="status-tab" onclick="filterByStatus('completed')">Completed (18)</button>
+            <button class="status-tab" onclick="filterByStatus('failed')">Failed (2)</button>
+            <button class="status-tab" onclick="filterByStatus('pending')">Pending (1)</button>
+        </div>
+
+        <div class="files-table">
+            <div class="table-header">
+                <div class="table-header-row">
+                    <div class="table-header-cell">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('filename')">
+                        File Name ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('app')">
+                        Target App ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('size')">
+                        File Size ↕
+                    </div>
+                    <div class="table-header-cell">
+                        Records
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('status')">
+                        Status ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('uploaded')">
+                        Date Uploaded ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('user')">
+                        Uploaded By ↕
+                    </div>
+                    <div class="table-header-cell">
+                        Progress
+                    </div>
+                    <div class="table-header-cell">
+                        Actions
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-body" id="tableBody">
+                <!-- Table rows will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const filesData = [
+            {
+                id: 1,
+                filename: 'INVENTORY_UPLOAD_Q3_2025.xlsx',
+                app: 'PSA (Closeout)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '2.4 MB',
+                sizeBytes: 2400000,
+                records: 1250,
+                status: 'completed',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'John Doe',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 2,
+                filename: 'PRODUCT_CATALOG_UPDATE_AUG.xlsx',
+                app: 'Item Hub',
+                appFull: 'Item Maintenace',
+                size: '5.2 MB',
+                sizeBytes: 5200000,
+                records: 3420,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'Jane Smith',
+                progress: 65,
+                error: null
+            },
+            {
+                id: 3,
+                filename: 'INVENTORY_SERVICE_DATA.xlsx',
+                app: 'PSA (Multi-SKU Marketplace)',
+                appFull: 'ISU (Inventory Service Unit)',
+                size: '1.8 MB',
+                sizeBytes: 1800000,
+                records: 890,
+                status: 'failed',
+                uploaded: '21-Aug-2025',
+                uploadedBy: 'Mike Johnson',
+                progress: 0,
+                error: 'Invalid data format in column D'
+            },
+            {
+                id: 4,
+                filename: 'SEASONAL_PRODUCTS_FALL2025.xlsx',
+                app: 'PSA (Toolio)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '3.1 MB',
+                sizeBytes: 3100000,
+                records: 2100,
+                status: 'completed',
+                uploaded: '21-Aug-2025',
+                uploadedBy: 'Sarah Wilson',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 5,
+                filename: 'ITEM_MASTER_UPDATE_BATCH2.xlsx',
+                app: 'Item Maintenace',
+                appFull: 'Item Hub',
+                size: '4.7 MB',
+                sizeBytes: 4700000,
+                records: 2850,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'David Chen',
+                progress: 35,
+                error: null
+            },
+            {
+                id: 6,
+                filename: 'WAREHOUSE_LOCATIONS.xlsx',
+                app: 'ISU',
+                appFull: 'ISU (Inventory Service Unit)',
+                size: '856 KB',
+                sizeBytes: 856000,
+                records: 420,
+                status: 'completed',
+                uploaded: '20-Aug-2025',
+                uploadedBy: 'Lisa Rodriguez',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 7,
+                filename: 'VENDOR_CATALOG_UPDATES.xlsx',
+                app: 'PSA (Closeout)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '6.2 MB',
+                sizeBytes: 6200000,
+                records: 4500,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'Tom Anderson',
+                progress: 80,
+                error: null
+            },
+            {
+                id: 8,
+                filename: 'PRICE_UPDATES_AUGUST.xlsx',
+                app: 'Item Maintenace',
+                appFull: 'Item Hub',
+                size: '1.2 MB',
+                sizeBytes: 1200000,
+                records: 780,
+                status: 'failed',
+                uploaded: '21-Aug-2025',
+                uploadedBy: 'Emma Thompson',
+                progress: 0,
+                error: 'Price validation failed for 23 items'
+            },
+            {
+                id: 9,
+                filename: 'NEW_ITEM_REQUESTS_Q3.xlsx',
+                app: 'Item Maintenace',
+                appFull: 'Item Hub',
+                size: '2.8 MB',
+                sizeBytes: 2800000,
+                records: 1650,
+                status: 'pending',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'Alex Kumar',
+                progress: 0,
+                error: null
+            }
+        ];
+
+        let currentData = [...filesData];
+        let currentSort = { column: null, direction: 'asc' };
+
+        function renderTable(data = currentData) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            data.forEach(file => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <div>
+                        <input type="checkbox" class="row-checkbox" value="${file.id}">
+                    </div>
+                    <div class="file-name">
+                        <div class="file-icon">XLS</div>
+                        ${file.filename}
+                    </div>
+                    <div class="target-app">${file.app}</div>
+                    <div class="file-size">${file.size}</div>
+                    <div class="records-count">${file.records.toLocaleString()}</div>
+                    <div>
+                        <div class="status-badge status-${file.status}">${file.status}</div>
+                        ${file.error ? `<div class="error-message">${file.error}</div>` : ''}
+                    </div>
+                    <div class="date-cell">${file.uploaded}</div>
+                    <div class="uploaded-by">${file.uploadedBy}</div>
+                    <div>
+                        ${file.status === 'processing' ? 
+                            `<div class="progress-bar">
+                                <div class="progress-fill" style="width: ${file.progress}%"></div>
+                             </div>` : 
+                            file.status === 'completed' ? 
+                                '<span style="color: #28a745; font-size: 12px;">✓ Complete</span>' : 
+                                file.status === 'failed' ? 
+                                    '<span style="color: #dc3545; font-size: 12px;">✗ Failed</span>' :
+                                    '<span style="color: #666; font-size: 12px;">Queued</span>'
+                        }
+                    </div>
+                    <div class="actions-cell">
+                         <button class="action-btn download-btn" onclick="openTaskManager()">Task Manager</button> 
+						 <button class="action-btn detail-btn" onclick="details()">Details</button>
+                        <!-- <button class="action-btn" onclick="viewDetails(${file.id})">Details</button>
+                        <button class="action-btn delete-btn" onclick="deleteFile(${file.id})">Delete</button> -->
+                    </div>
+					
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+
+			// Navigate to the task_manager.html file on button click  
+		 function openTaskManager() {  
+			window.location.href = "task_manager.html"; // Replace with the correct path if the file is in another folder  
+		  }  
+		  
+		  // Placeholder function for viewDetails (existing functionality)  
+		  function viewDetails(fileId) {  
+			console.log(`View details for file ID: ${fileId}`);  
+		 } 
+		 
+		 function details() {  
+			window.location.href = "offerdetail.html"; // Replace with the correct path if the file is in another folder  
+		  }  
+		  
+		  
+		  
+        function filterByStatus(status) {
+            // Update active tab
+            document.querySelectorAll('.status-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter data
+            if (status === 'all') {
+                currentData = [...filesData];
+            } else {
+                currentData = filesData.filter(file => file.status === status);
+            }
+            renderTable(currentData);
+        }
+
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+
+            currentData.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(column) {
+                    case 'filename':
+                        aVal = a.filename.toLowerCase();
+                        bVal = b.filename.toLowerCase();
+                        break;
+                    case 'app':
+                        aVal = a.app.toLowerCase();
+                        bVal = b.app.toLowerCase();
+                        break;
+                    case 'size':
+                        aVal = a.sizeBytes;
+                        bVal = b.sizeBytes;
+                        break;
+                    case 'status':
+                        aVal = a.status;
+                        bVal = b.status;
+                        break;
+                    case 'uploaded':
+                        aVal = new Date(a.uploaded);
+                        bVal = new Date(b.uploaded);
+                        break;
+                    case 'user':
+                        aVal = a.uploadedBy.toLowerCase();
+                        bVal = b.uploadedBy.toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (currentSort.direction === 'asc') {
+                    return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                } else {
+                    return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+                }
+            });
+
+            renderTable(currentData);
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        function downloadFile(id) {
+            const file = filesData.find(f => f.id === id);
+            alert(`Redirecting to Task Manager to view open tasks for : ${file.filename}`);
+        }
+
+        function viewDetails(id) {
+            const file = filesData.find(f => f.id === id);
+            alert(`File Details:\n\nName: ${file.filename}\nApp: ${file.appFull}\nStatus: ${file.status}\nRecords: ${file.records}\nUploaded by: ${file.uploadedBy}\nDate: ${file.uploaded}`);
+        }
+
+        function deleteFile(id) {
+            const file = filesData.find(f => f.id === id);
+            if (confirm(`Are you sure you want to delete "${file.filename}"?`)) {
+                const index = filesData.findIndex(f => f.id === id);
+                filesData.splice(index, 1);
+                currentData = [...filesData];
+                renderTable(currentData);
+                alert('File deleted successfully.');
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function goToUploader() {
+            // Navigate to uploader page
+            alert('Navigating to file uploader...');
+        }
+
+        // Initialize table
+        renderTable();
+
+        // Simulate real-time progress updates
+        setInterval(() => {
+            let updated = false;
+            filesData.forEach(file => {
+                if (file.status === 'processing' && file.progress < 100) {
+                    file.progress = Math.min(100, file.progress + Math.random() * 10);
+                    if (file.progress >= 100) {
+                        file.status = 'completed';
+                    }
+                    updated = true;
+                }
+            });
+            
+            if (updated) {
+                renderTable(currentData);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

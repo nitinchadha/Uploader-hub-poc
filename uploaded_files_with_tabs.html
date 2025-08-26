@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Files - File Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #0066cc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #f0f7ff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #0066cc;
+            border: 2px solid #0066cc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-outline:hover {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+            border: 2px solid #0066cc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+            border-color: #0052a3;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stats-text {
+            color: #0c5460;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .main-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            padding: 0 20px;
+        }
+
+        .main-tab {
+            background: none;
+            border: none;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .main-tab.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .main-tab:hover:not(.active) {
+            color: #0066cc;
+            background: rgba(0, 102, 204, 0.02);
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .filters-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .status-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .status-tab {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .status-tab.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+        }
+
+        .status-tab:hover {
+            color: #0066cc;
+            background: #f8f9fa;
+        }
+
+        .files-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .table-header-row {
+            display: grid;
+            grid-template-columns: 40px 300px 120px 120px 100px 120px 80px 80px 80px 150px 120px 120px 1fr;
+            gap: 16px;
+            padding: 16px 20px;
+            align-items: center;
+        }
+
+        .table-header-cell {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sortable {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sortable:hover {
+            color: #0066cc;
+        }
+
+        .table-body {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 40px 300px 120px 120px 100px 120px 80px 80px 80px 150px 120px 120px 1fr;
+            gap: 16px;
+            padding: 16px 20px;
+            align-items: center;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.2s;
+        }
+
+        .table-row:hover {
+            background: #f8f9fa;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .row-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            background: #28a745;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .target-app {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .file-size {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-processing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .records-count {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .match-link {
+            color: #28a745;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .match-link:hover {
+            text-decoration: underline;
+        }
+
+        .partial-match-link {
+            color: #ffc107;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .partial-match-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-match-link {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .no-match-link:hover {
+            text-decoration: underline;
+        }
+
+        .date-cell {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .uploaded-by {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #0066cc;
+            color: #0066cc;
+        }
+
+        .download-btn {
+            color: #28a745;
+            border-color: #28a745;
+        }
+
+        .download-btn:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .detail-btn {
+            color: #3592dc;
+            border-color: #3592dc;
+        }
+        
+        .detail-btn:hover {
+            background: #3592dc;
+            color: white;
+        }
+
+        .delete-btn {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 60px;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            transition: width 0.3s ease;
+        }
+
+        .error-message {
+            font-size: 11px;
+            color: #dc3545;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 1200px) {
+            .table-header-row,
+            .table-row {
+                grid-template-columns: 40px 250px 100px 100px 80px 100px 60px 60px 60px 120px 100px 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header-row,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .table-header-cell,
+            .table-row > div {
+                display: flex;
+                justify-content: space-between;
+                padding: 4px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()">
+                ← Back to Dashboard
+            </button>
+        </div>
+        <div class="header-actions">
+            <a href="#" class="btn-outline">Download Template</a>
+            <a href="#" class="btn-primary" onclick="goToUploader()">Upload Files</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Uploaded Files</h1>
+            <p class="page-subtitle">Manage and monitor all uploaded Excel files and their processing status</p>
+            
+            <div class="stats-bar">
+                <span class="stats-text" id="statsText">Total Files: 24 | Processing: 3 | Completed: 18 | Failed: 2 | Pending: 1</span>
+            </div>
+        </div>
+
+        <div class="main-tabs">
+            <button class="main-tab active" onclick="switchMainTab('my-files')">My Files</button>
+            <button class="main-tab" onclick="switchMainTab('all-files')">All Files</button>
+        </div>
+
+        <div class="filters-section">
+            <h3 class="filters-title">Quick Filters</h3>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label class="filter-label">Target App</label>
+                    <select class="filter-select" id="appFilter" onchange="applyFilters()">
+                        <option value="">Select target application...</option>
+                        <option value="psa">PSA (Closeout)</option>
+                        <option value="multi-sku">PSA (Multi-SKU Marketplace)</option>
+                        <option value="toolio">PSA (Toolio)</option>
+                        <option value="item-hub">Item Maintenance</option>
+                        <option value="isu">ISU</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Uploaded By</label>
+                    <select class="filter-select" id="userFilter" onchange="applyFilters()">
+                        <option value="">All Users</option>
+                        <option value="nitin.chadha">Nitin Chadha</option>
+                        <option value="john.doe">John Doe</option>
+                        <option value="jane.smith">Jane Smith</option>
+                        <option value="mike.johnson">Mike Johnson</option>
+                        <option value="sarah.wilson">Sarah Wilson</option>
+                        <option value="david.chen">David Chen</option>
+                        <option value="lisa.rodriguez">Lisa Rodriguez</option>
+                        <option value="tom.anderson">Tom Anderson</option>
+                        <option value="emma.thompson">Emma Thompson</option>
+                        <option value="alex.kumar">Alex Kumar</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <select class="filter-select" id="dateFilter" onchange="applyFilters()">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-tabs">
+            <button class="status-tab active" onclick="filterByStatus('all')">All Files</button>
+            <button class="status-tab" onclick="filterByStatus('processing')">Processing</button>
+            <button class="status-tab" onclick="filterByStatus('completed')">Completed</button>
+            <button class="status-tab" onclick="filterByStatus('failed')">Failed</button>
+            <button class="status-tab" onclick="filterByStatus('pending')">Pending</button>
+        </div>
+
+        <div class="files-table">
+            <div class="table-header">
+                <div class="table-header-row">
+                    <div class="table-header-cell">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('filename')">
+                        File Name ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('app')">
+                        Target App ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('size')">
+                        File Size ↕
+                    </div>
+                    <div class="table-header-cell">
+                        Records
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('status')">
+                        Status ↕
+                    </div>
+                    <div class="table-header-cell">
+                        Match
+                    </div>
+                    <div class="table-header-cell">
+                        Partial
+                    </div>
+                    <div class="table-header-cell">
+                        No Match
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('uploaded')">
+                        Date Uploaded ↕
+                    </div>
+                    <div class="table-header-cell sortable" onclick="sortTable('user')">
+                        Uploaded By ↕
+                    </div>
+                    <!--<div class="table-header-cell">
+                        Progress
+                    </div> -->
+                    <div class="table-header-cell">
+                        Actions
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-body" id="tableBody">
+                <!-- Table rows will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - simulate current logged in user
+        const currentUser = 'John Doe';
+        
+        const filesData = [
+            {
+                id: 1,
+                filename: 'INVENTORY_UPLOAD_Q3_2025.xlsx',
+                app: 'PSA (Closeout)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '2.4 MB',
+                sizeBytes: 2400000,
+                records: 20,
+                match: 12,
+                partialMatch: 5,
+                noMatch: 3,
+                status: 'completed',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'John Doe',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 2,
+                filename: 'PRODUCT_CATALOG_UPDATE_AUG.xlsx',
+                app: 'Item Maintenance',
+                appFull: 'Item Maintenance',
+                size: '5.2 MB',
+                sizeBytes: 5200000,
+                records: 3420,
+                match: 2052,
+                partialMatch: 855,
+                noMatch: 513,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'Jane Smith',
+                progress: 65,
+                error: null
+            },
+            {
+                id: 3,
+                filename: 'INVENTORY_SERVICE_DATA.xlsx',
+                app: 'PSA (Multi-SKU Marketplace)',
+                appFull: 'ISU (Inventory Service Unit)',
+                size: '1.8 MB',
+                sizeBytes: 1800000,
+                records: 890,
+                match: 534,
+                partialMatch: 223,
+                noMatch: 133,
+                status: 'failed',
+                uploaded: '21-Aug-2025',
+                uploadedBy: 'Mike Johnson',
+                progress: 0,
+                error: 'Invalid data format in column D'
+            },
+            {
+                id: 4,
+                filename: 'SEASONAL_PRODUCTS_FALL2025.xlsx',
+                app: 'PSA (Toolio)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '3.1 MB',
+                sizeBytes: 3100000,
+                records: 2100,
+                match: 1260,
+                partialMatch: 525,
+                noMatch: 315,
+                status: 'completed',
+                uploaded: '21-Aug-2025',
+                uploadedBy: 'Sarah Wilson',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 5,
+                filename: 'ITEM_MASTER_UPDATE_BATCH2.xlsx',
+                app: 'Item Maintenance',
+                appFull: 'Item Hub',
+                size: '4.7 MB',
+                sizeBytes: 4700000,
+                records: 2850,
+                match: 1710,
+                partialMatch: 713,
+                noMatch: 427,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'David Chen',
+                progress: 35,
+                error: null
+            },
+            {
+                id: 6,
+                filename: 'WAREHOUSE_LOCATIONS.xlsx',
+                app: 'ISU',
+                appFull: 'ISU (Inventory Service Unit)',
+                size: '856 KB',
+                sizeBytes: 856000,
+                records: 420,
+                match: 252,
+                partialMatch: 105,
+                noMatch: 63,
+                status: 'completed',
+                uploaded: '20-Aug-2025',
+                uploadedBy: 'Lisa Rodriguez',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 7,
+                filename: 'VENDOR_CATALOG_UPDATES.xlsx',
+                app: 'PSA (Closeout)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '6.2 MB',
+                sizeBytes: 6200000,
+                records: 4500,
+                match: 2700,
+                partialMatch: 1125,
+                noMatch: 675,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'Tom Anderson',
+                progress: 80,
+                error: null
+            },
+            {
+                id: 8,
+                filename: 'PRICE_UPDATES_AUGUST.xlsx',
+                app: 'Item Maintenance',
+                appFull: 'Item Hub',
+                size: '1.2 MB',
+                sizeBytes: 1200000,
+                records: 780,
+                match: 468,
+                partialMatch: 195,
+                noMatch: 117,
+                status: 'failed',
+                uploaded: '21-Aug-2025',
+                uploadedBy: 'Emma Thompson',
+                progress: 0,
+                error: 'Price validation failed for 23 items'
+            },
+            {
+                id: 9,
+                filename: 'NEW_ITEM_REQUESTS_Q3.xlsx',
+                app: 'Item Maintenance',
+                appFull: 'Item Hub',
+                size: '2.8 MB',
+                sizeBytes: 2800000,
+                records: 1650,
+                match: 990,
+                partialMatch: 413,
+                noMatch: 247,
+                status: 'pending',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'Alex Kumar',
+                progress: 0,
+                error: null
+            },
+            // Add more files uploaded by current user for better demo
+            {
+                id: 10,
+                filename: 'MY_PRODUCT_LIST_AUGUST.xlsx',
+                app: 'PSA (Closeout)',
+                appFull: 'PSA (Product Selection & Assortment)',
+                size: '1.9 MB',
+                sizeBytes: 1900000,
+                records: 950,
+                match: 570,
+                partialMatch: 238,
+                noMatch: 142,
+                status: 'completed',
+                uploaded: '20-Aug-2025',
+                uploadedBy: 'John Doe',
+                progress: 100,
+                error: null
+            },
+            {
+                id: 11,
+                filename: 'INVENTORY_CHECK_BATCH1.xlsx',
+                app: 'ISU',
+                appFull: 'ISU (Inventory Service Unit)',
+                size: '3.5 MB',
+                sizeBytes: 3500000,
+                records: 1800,
+                match: 1080,
+                partialMatch: 450,
+                noMatch: 270,
+                status: 'processing',
+                uploaded: '22-Aug-2025',
+                uploadedBy: 'John Doe',
+                progress: 45,
+                error: null
+            }
+        ];
+
+        let currentData = [...filesData];
+        let currentSort = { column: null, direction: 'asc' };
+        let currentMainTab = 'my-files';
+        let currentStatusFilter = 'all';
+
+        function switchMainTab(tab) {
+            // Update active tab
+            document.querySelectorAll('.main-tab').forEach(tabElement => {
+                tabElement.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            currentMainTab = tab;
+            
+            // Reset status filter when switching main tabs
+            currentStatusFilter = 'all';
+            document.querySelectorAll('.status-tab').forEach(statusTab => {
+                statusTab.classList.remove('active');
+            });
+            document.querySelector('.status-tab').classList.add('active');
+
+            // Reset other filters
+            document.getElementById('appFilter').value = '';
+            document.getElementById('userFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+
+            applyAllFilters();
+        }
+
+        function filterByStatus(status) {
+            // Update active tab
+            document.querySelectorAll('.status-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            currentStatusFilter = status;
+            applyAllFilters();
+        }
+
+        function applyFilters() {
+            applyAllFilters();
+        }
+
+        function applyAllFilters() {
+            let filteredData = [...filesData];
+
+            // Apply main tab filter first
+            if (currentMainTab === 'my-files') {
+                filteredData = filteredData.filter(file => file.uploadedBy === currentUser);
+            }
+
+            // Apply status filter
+            if (currentStatusFilter !== 'all') {
+                filteredData = filteredData.filter(file => file.status === currentStatusFilter);
+            }
+
+            // Apply app filter
+            const appFilter = document.getElementById('appFilter').value;
+            if (appFilter) {
+                filteredData = filteredData.filter(file => 
+                    file.app.toLowerCase().includes(appFilter.toLowerCase())
+                );
+            }
+
+            // Apply user filter
+            const userFilter = document.getElementById('userFilter').value;
+            if (userFilter) {
+                filteredData = filteredData.filter(file => 
+                    file.uploadedBy.toLowerCase().replace(/\s+/g, '.') === userFilter
+                );
+            }
+
+            // Apply date filter (simplified for demo)
+            const dateFilter = document.getElementById('dateFilter').value;
+            if (dateFilter === 'today') {
+                filteredData = filteredData.filter(file => file.uploaded === '22-Aug-2025');
+            }
+
+            currentData = filteredData;
+            updateStats(filteredData);
+            updateStatusTabCounts(filteredData);
+            renderTable(filteredData);
+        }
+
+        function updateStats(data) {
+            const total = data.length;
+            const processing = data.filter(f => f.status === 'processing').length;
+            const completed = data.filter(f => f.status === 'completed').length;
+            const failed = data.filter(f => f.status === 'failed').length;
+            const pending = data.filter(f => f.status === 'pending').length;
+
+            const prefix = currentMainTab === 'my-files' ? 'My ' : '';
+            document.getElementById('statsText').textContent = 
+                `${prefix}Total Files: ${total} | Processing: ${processing} | Completed: ${completed} | Failed: ${failed} | Pending: ${pending}`;
+        }
+
+        function updateStatusTabCounts(data) {
+            const processing = data.filter(f => f.status === 'processing').length;
+            const completed = data.filter(f => f.status === 'completed').length;
+            const failed = data.filter(f => f.status === 'failed').length;
+            const pending = data.filter(f => f.status === 'pending').length;
+
+            const tabs = document.querySelectorAll('.status-tab');
+            tabs[1].textContent = `Processing (${processing})`;
+            tabs[2].textContent = `Completed (${completed})`;
+            tabs[3].textContent = `Failed (${failed})`;
+            tabs[4].textContent = `Pending (${pending})`;
+        }
+
+        function renderTable(data = currentData) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                const noDataRow = document.createElement('div');
+                noDataRow.style.padding = '40px';
+                noDataRow.style.textAlign = 'center';
+                noDataRow.style.color = '#666';
+                noDataRow.style.fontSize = '14px';
+                noDataRow.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+                    <div>No files found matching your criteria</div>
+                `;
+                tableBody.appendChild(noDataRow);
+                return;
+            }
+
+            data.forEach(file => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <div>
+                        <input type="checkbox" class="row-checkbox" value="${file.id}">
+                    </div>
+                    <div class="file-name">
+                        <div class="file-icon">XLS</div>
+                        ${file.filename}
+                    </div>
+                    <div class="target-app">${file.app}</div>
+                    <div class="file-size">${file.size}</div>
+                    <div class="records-count">${file.records.toLocaleString()}</div>
+                    <div>
+                        <div class="status-badge status-${file.status}">${file.status}</div>
+                        ${file.error ? `<div class="error-message">${file.error}</div>` : ''}
+                    </div>
+                    <div>
+                        <a href="match.html" class="match-link">${file.match}</a>
+                    </div>
+                    <div>
+                        <a href="partial-match.html" class="partial-match-link">${file.partialMatch}</a>
+                    </div>
+                    <div>
+                        <a href="no-match.html" class="no-match-link">${file.noMatch}</a>
+                    </div>
+                    <div class="date-cell">${file.uploaded}</div>
+                    <div class="uploaded-by">${file.uploadedBy}</div>
+                    <div>
+                        ${file.status === 'processing' ? 
+                            `<div class="progress-bar">
+                                <div class="progress-fill" style="width: ${file.progress}%"></div>
+                             </div>` : 
+                            file.status === 'completed' ? 
+                                '<span style="color: #28a745; font-size: 12px;">✓ Complete</span>' : 
+                                file.status === 'failed' ? 
+                                    '<span style="color: #dc3545; font-size: 12px;">✗ Failed</span>' :
+                                    '<span style="color: #666; font-size: 12px;">Queued</span>'
+                        }
+                    </div>
+                    <div class="actions-cell">
+                         <button class="action-btn download-btn" onclick="openTaskManager()">Task Manager</button> 
+                         <button class="action-btn detail-btn" onclick="details()">Details</button>
+                    </div>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Navigate to the task_manager.html file on button click  
+        function openTaskManager() {  
+            window.location.href = "task_manager.html";
+        }  
+          
+        function details() {  
+            window.location.href = "offerdetail.html";
+        }  
+
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+
+            currentData.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(column) {
+                    case 'filename':
+                        aVal = a.filename.toLowerCase();
+                        bVal = b.filename.toLowerCase();
+                        break;
+                    case 'app':
+                        aVal = a.app.toLowerCase();
+                        bVal = b.app.toLowerCase();
+                        break;
+                    case 'size':
+                        aVal = a.sizeBytes;
+                        bVal = b.sizeBytes;
+                        break;
+                    case 'status':
+                        aVal = a.status;
+                        bVal = b.status;
+                        break;
+                    case 'uploaded':
+                        aVal = new Date(a.uploaded);
+                        bVal = new Date(b.uploaded);
+                        break;
+                    case 'user':
+                        aVal = a.uploadedBy.toLowerCase();
+                        bVal = b.uploadedBy.toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (currentSort.direction === 'asc') {
+                    return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                } else {
+                    return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+                }
+            });
+
+            renderTable(currentData);
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        function downloadFile(id) {
+            const file = filesData.find(f => f.id === id);
+            alert(`Redirecting to Task Manager to view open tasks for : ${file.filename}`);
+        }
+
+        function viewDetails(id) {
+            const file = filesData.find(f => f.id === id);
+            alert(`File Details:\n\nName: ${file.filename}\nApp: ${file.appFull}\nStatus: ${file.status}\nRecords: ${file.records}\nMatches: ${file.match}\nPartial Matches: ${file.partialMatch}\nNo Matches: ${file.noMatch}\nUploaded by: ${file.uploadedBy}\nDate: ${file.uploaded}`);
+        }
+
+        function deleteFile(id) {
+            const file = filesData.find(f => f.id === id);
+            if (confirm(`Are you sure you want to delete "${file.filename}"?`)) {
+                const index = filesData.findIndex(f => f.id === id);
+                filesData.splice(index, 1);
+                applyAllFilters();
+                alert('File deleted successfully.');
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function goToUploader() {
+            alert('Navigating to file uploader...');
+        }
+
+        // Initialize the page
+        function init() {
+            // Start with "My Files" tab active and apply initial filters
+            applyAllFilters();
+        }
+
+        // Initialize table
+        init();
+
+        // Simulate real-time progress updates
+        setInterval(() => {
+            let updated = false;
+            filesData.forEach(file => {
+                if (file.status === 'processing' && file.progress < 100) {
+                    file.progress = Math.min(100, file.progress + Math.random() * 10);
+                    if (file.progress >= 100) {
+                        file.status = 'completed';
+                    }
+                    updated = true;
+                }
+            });
+            
+            if (updated) {
+                applyAllFilters();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

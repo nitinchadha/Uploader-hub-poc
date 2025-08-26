@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel File Uploader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #0066cc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #f0f7ff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .section-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: #0066cc;
+            background: #f0f7ff;
+        }
+
+        .upload-zone.drag-over {
+            border-color: #0066cc;
+            background: #f0f7ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: #e1e5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #666;
+        }
+
+        .upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .upload-subtext {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .file-types {
+            background: #f8f9fa;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .select-btn {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .select-btn:hover {
+            background: #0052a3;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 30px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #28a745;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            background: #28a745;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .file-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: #f8d7da;
+        }
+
+        .upload-summary {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-text {
+            color: #0c5460;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #666;
+            border: 2px solid #e1e5e9;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #cbd5e0;
+        }
+
+        .template-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .template-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 0 20px;
+                margin: 20px auto;
+            }
+            
+            .upload-section {
+                padding: 30px 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+	<div class="header">
+        <button class="back-btn" onclick="goBack()">
+           ← Back
+        </button>
+       		<a href="uploaded_files_with_tabs.html" class="back-btn" onclick="goToListView()" style="margin-left: 20px;">
+            📋 View Uploaded Files
+        </a>
+			<a href="offer_with_error.html" class="back-btn" onclick="goToListView()" style="margin-left: 20px;">
+            📋 Error screen
+        </a>
+		 </a>
+			<a href="offerdetail.html" class="back-btn" onclick="goToListView()" style="margin-left: 20px;">
+            📋 Offer detail
+        </a>
+		
+    </div>
+
+    <div class="container">
+        <div class="upload-section">
+            <h1 class="section-title">Upload Excel Files</h1>
+            <p class="section-subtitle">Upload multiple Excel files and specify which target application should process them</p>
+			
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Target Application *</label>
+                    <select class="form-select" id="subApplication">
+                        <option value="">Select target application...</option>
+                        <option value="psa">PSA (Closeout)</option>
+                        <option value="multi-sku">PSA (Multi-SKU Marketplace)</option>
+						<option value="multi-sku">PSA (Toolio)</option>
+						<option value="item-hub">Item Maintenace</option>
+                        <option value="isu">ISU</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">⬆️</div>
+                <div class="upload-text">Drag & drop Excel files here</div>
+                <div class="upload-subtext">or click to browse files</div>
+                <div class="file-types">Supported: .xlsx, .xls, .xlsm, .pdf (Max 20MB per file)</div>
+                <button class="select-btn" type="button">Select Files</button>
+            </div>
+
+            <input type="file" id="fileInput" class="file-input" multiple accept=".xlsx,.xls,.xlsm, .pdf">
+
+            <div class="file-list" id="fileList"></div>
+
+            <div class="upload-summary" id="uploadSummary" style="display: none;">
+                <div class="summary-text" id="summaryText"></div>
+                <a href="#" class="template-link">Download Template</a>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" id="uploadBtn" onclick="uploadfiles()" >Upload Files</button>
+                <button class="btn-secondary" onclick="clearAll()">
+                    Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+	
+	function uploadfiles() {  
+			window.location.href = "uploaded_files_with_tabs.html"; // Replace with the correct path if the file is in another folder  
+		  }
+		  
+		  
+        let selectedFiles = [];
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const uploadSummary = document.getElementById('uploadSummary');
+        const summaryText = document.getElementById('summaryText');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const subAppSelect = document.getElementById('subApplication');
+
+        // Drag and drop events
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Sub-application selection change
+        subAppSelect.addEventListener('change', updateUploadButton);
+
+        function handleFiles(files) {
+            for (let file of files) {
+                if (isValidExcelFile(file)) {
+                    if (!selectedFiles.find(f => f.name === file.name)) {
+                        selectedFiles.push(file);
+                    }
+                } else {
+                    alert(`${file.name} is not a valid Excel file or exceeds 10MB limit.`);
+                }
+            }
+            updateFileList();
+            updateSummary();
+            updateUploadButton();
+        }
+
+        function isValidExcelFile(file) {
+            const validTypes = [
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel',
+                'application/vnd.ms-excel.sheet.macroEnabled.12'
+            ];
+            const validExtensions = ['.xlsx', '.xls', '.xlsm'];
+            const hasValidExtension = validExtensions.some(ext => 
+                file.name.toLowerCase().endsWith(ext)
+            );
+            return (validTypes.includes(file.type) || hasValidExtension) && file.size <= 10 * 1024 * 1024;
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">XLS</div>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="remove-btn" onclick="removeFile(${index})">✕</button>
+                    </div>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function updateSummary() {
+            if (selectedFiles.length > 0) {
+                const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+                summaryText.textContent = `${selectedFiles.length} file(s) selected • Total size: ${formatFileSize(totalSize)}`;
+                uploadSummary.style.display = 'flex';
+            } else {
+                uploadSummary.style.display = 'none';
+            }
+        }
+
+        function updateUploadButton() {
+            const hasFiles = selectedFiles.length > 0;
+            const hasSubApp = subAppSelect.value !== '';
+            uploadBtn.disabled = !(hasFiles && hasSubApp);
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+            updateSummary();
+            updateUploadButton();
+        }
+
+        function clearAll() {
+            selectedFiles = [];
+            fileInput.value = '';
+            updateFileList();
+            updateSummary();
+            updateUploadButton();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function processUpload() {
+            if (selectedFiles.length === 0 || !subAppSelect.value) {
+                alert('Please select files and a target application before uploading.');
+                return;
+            }
+
+            const uploadData = {
+                files: selectedFiles.map(f => ({
+                    name: f.name,
+                    size: f.size,
+                    type: f.type
+                })),
+                targetApplication: subAppSelect.value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Simulate upload process
+            uploadBtn.textContent = 'Uploading...';
+            uploadBtn.disabled = true;
+
+            setTimeout(() => {
+                alert(`Successfully uploaded ${selectedFiles.length} file(s) to ${subAppSelect.options[subAppSelect.selectedIndex].text}`);
+                console.log('Upload data:', uploadData);
+                
+                // Reset form
+                clearAll();
+                subAppSelect.value = '';
+                
+                uploadBtn.textContent = 'Upload Files';
+                updateUploadButton();
+            }, 2000);
+        }
+
+        function goBack() {
+            // Simulate navigation back
+            if (confirm('Are you sure you want to go back? Any unsaved changes will be lost.')) {
+                window.history.back();
+            }
+        }
+    </script>
+</body>
+</html>

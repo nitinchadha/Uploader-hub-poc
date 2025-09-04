@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Matching - Compare Attributes</title>
+    <title>Nordstrom Retail Hub - Item Matching</title>
     <style>
         * {
             margin: 0;
@@ -13,617 +13,663 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
             color: #333;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
         }
 
         .header {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .header h1 {
-            font-size: 24px;
-            font-weight: 600;
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .retail-hub {
+            color: #4285f4;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #666;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 12px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .main-content {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 300;
             margin-bottom: 8px;
-            color: #1a1a1a;
         }
 
-        .header p {
+        .page-subtitle {
             color: #666;
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 4px;
         }
 
-        .filter-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        .total-pairs {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
             gap: 16px;
-            align-items: end;
+        }
+
+        .filters {
+            display: flex;
+            gap: 16px;
+            flex: 1;
         }
 
         .filter-group {
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
 
         .filter-label {
             font-size: 12px;
-            font-weight: 600;
             color: #666;
-            margin-bottom: 6px;
-            text-transform: uppercase;
+            font-weight: 500;
         }
 
         .filter-select {
             padding: 8px 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
+            min-width: 150px;
             background: white;
-            cursor: pointer;
         }
 
-        .filter-select:focus {
-            outline: none;
-            border-color: #0066cc;
-        }
-
-        .actions-section {
+        .actions {
             display: flex;
             gap: 12px;
-            justify-content: flex-end;
-            margin-bottom: 20px;
         }
 
         .btn {
             padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
+            border-radius: 4px;
             font-size: 14px;
-            border: 2px solid;
-            text-decoration: none;
-            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
         }
 
-        .btn-outline {
+        .btn-secondary {
             background: white;
-            color: #0066cc;
-            border-color: #0066cc;
-        }
-
-        .btn-outline:hover {
-            background: #0066cc;
-            color: white;
-        }
-
-        .btn-primary {
-            background: #0066cc;
-            color: white;
-            border-color: #0066cc;
-        }
-
-        .btn-primary:hover {
-            background: #0052a3;
-            border-color: #0052a3;
-        }
-
-        .match-item {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .match-item-header {
-            display: grid;
-            grid-template-columns: 80px 1fr auto;
-            gap: 20px;
-            padding: 20px;
-            align-items: center;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .product-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid #e1e5e9;
-        }
-
-        .product-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .upc-code {
-            font-size: 16px;
-            font-weight: 600;
+            border: 1px solid #ccc;
             color: #333;
         }
 
-        .brand-name {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
+        .btn-primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .comparison-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .comparison-header {
+            background: #f8f9fa;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .upc-info {
             font-weight: 600;
+            font-size: 16px;
+        }
+
+        .brand-name {
+            color: #666;
+            font-size: 14px;
+            margin-top: 2px;
         }
 
         .task-info {
             text-align: right;
-            font-size: 12px;
-            color: #666;
         }
 
         .task-id {
-            color: #0066cc;
-            font-weight: 600;
-            margin-bottom: 2px;
+            font-size: 12px;
+            color: #4285f4;
+            font-weight: 500;
         }
 
         .due-date {
-            color: #666;
-        }
-
-        .attributes-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .attribute-column {
-            padding: 12px;
-            border-right: 1px solid #f1f3f4;
             font-size: 12px;
-        }
-
-        .attribute-column:last-child {
-            border-right: none;
-        }
-
-        .attribute-header {
-            font-weight: 600;
             color: #666;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            font-size: 10px;
+            margin-top: 2px;
         }
 
-        .attribute-value {
-            color: #333;
-            font-size: 12px;
-            word-break: break-word;
-        }
-
-        .match-controls {
-            padding: 20px;
+        .comparison-content {
             display: flex;
-            justify-content: space-between;
+        }
+
+        .product-row {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-row:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 120px;
+            padding: 16px;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+
+        .product-image img {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .product-details {
+            flex: 1;
+            padding: 16px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 16px;
+            font-size: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .size-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .color-code {
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .match-decision {
+            width: 300px;
+            padding: 24px;
+            background: #f8f9fa;
+            border-left: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
         }
 
         .match-question {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 8px;
         }
 
         .match-select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
-            background: white;
-            cursor: pointer;
-            min-width: 180px;
         }
 
-        .match-select:focus {
-            outline: none;
-            border-color: #0066cc;
-        }
-
-        .total-items {
-            background: #e8f4f8;
-            border: 1px solid #bee5eb;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            text-align: center;
+        .system-label {
+            font-size: 11px;
             font-weight: 600;
-            color: #0c5460;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
-        @media (max-width: 768px) {
-            .match-item-header {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 12px;
-            }
-
-            .attributes-section {
-                grid-template-columns: 1fr;
-            }
-
-            .match-controls {
-                flex-direction: column;
-                gap: 12px;
-                align-items: stretch;
-            }
-
-            .filter-section {
-                grid-template-columns: 1fr;
-            }
-
-            .actions-section {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-        }
-
-        .highlight-exact {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .highlight-partial {
+        .highlight-yellow {
             background-color: #fff3cd;
-            color: #856404;
         }
 
-        .highlight-different {
-            background-color: #f8d7da;
-            color: #721c24;
+        .highlight-green {
+            background-color: #d4edda;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Item Matching</h1>
-            <p>Compare the attributes for each and identify the levels where the items align</p>
-            
-            <div class="filter-section">
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">NORDSTROM</div>
+            <div class="retail-hub">RETAIL HUB</div>
+        </div>
+        <div class="header-actions">
+            <span>🔔</span>
+            <span>❓</span>
+            <span>⋮</span>
+            <span>👤</span>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        ≡ Item Management | Item Matching
+    </div>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Item Matching</h1>
+            <p class="page-subtitle">Compare the attributes for each and identify the levels where the items align</p>
+            <p class="total-pairs">Total pairs: 5</p>
+        </div>
+
+        <div class="controls-section">
+            <div class="filters">
                 <div class="filter-group">
-                    <label class="filter-label">Domain</label>
-                    <select class="filter-select" id="domainFilter">
-                        <option value="">All</option>
-                        <option value="apparel">Apparel</option>
-                        <option value="electronics">Electronics</option>
-                        <option value="home">Home & Garden</option>
-                        <option value="beauty">Beauty</option>
+                    <label class="filter-label">Partner</label>
+                    <select class="filter-select">
+                        <option>--</option>
+                        <option>Billabong</option>
+                        <option>Other Partner</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Due Date Range</label>
-                    <select class="filter-select" id="dueDateFilter">
-                        <option value="">All</option>
-                        <option value="overdue">Overdue</option>
-                        <option value="today">Due Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
+                    <select class="filter-select">
+                        <option>--</option>
+                        <option>This Week</option>
+                        <option>Next Week</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Product ID</label>
-                    <select class="filter-select" id="productFilter">
-                        <option value="">All</option>
-                        <option value="33TTW">33TTW</option>
-                        <option value="45RTY">45RTY</option>
-                        <option value="67UIO">67UIO</option>
+                    <select class="filter-select">
+                        <option>--</option>
+                        <option>331TW</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select class="filter-select" id="typeFilter">
-                        <option value="">MATCH-100</option>
-                        <option value="match-95">MATCH-95</option>
-                        <option value="match-90">MATCH-90</option>
-                        <option value="partial">PARTIAL</option>
+                    <label class="filter-label">Task ID</label>
+                    <select class="filter-select">
+                        <option>MATCH-100</option>
+                        <option>MATCH-101</option>
+                    </select>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary">Clear Selections</button>
+                <button class="btn btn-primary">Submit Match Selections</button>
+            </div>
+        </div>
+
+        <!-- First Comparison Set -->
+        <div class="comparison-container">
+            <div class="comparison-header">
+                <div>
+                    <div class="upc-info">UPC: 1234567890</div>
+                    <!--<div class="brand-name">Mirakl</div> -->
+                </div>
+                <div class="task-info">
+                    <div class="task-id">Task ID: MATCH-100</div>
+                    <div class="due-date">Due date: 09/25/2025</div>
+                </div>
+            </div>
+            
+            <div class="comparison-content">
+                <div style="flex: 1;">
+                    <div class="product-row">
+                        <div class="system-label" style="padding: 16px; width: 120px; background: #f0f0f0;">Mirakl</div>
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=80&h=100&fit=crop" alt="Tanktop Floral">
+                        </div>
+                        <div class="product-details">
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">Product ID</div>
+                                    <div class="detail-value">331TW</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 1</div>
+                                    <div class="detail-value"><span class="size-badge">M</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 2</div>
+                                    <div class="detail-value">--</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Color Description</div>
+                                    <div class="detail-value">White</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">NRF Color Code</div>
+                                    <div class="detail-value"><span class="color-code">100</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">VPN</div>
+                                    <div class="detail-value">321654987</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Description</div>
+                                    <div class="detail-value">Tanktop Floral</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Label</div>
+                                    <div class="detail-value">1234567890</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Partner</div>
+                                    <div class="detail-value">Billabong (1234)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-row">
+                        <div class="system-label" style="padding: 16px; width: 120px; background: #f0f0f0;">JWN</div>
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=80&h=100&fit=crop" alt="Tanktop Floral">
+                        </div>
+                        <div class="product-details">
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">Product ID</div>
+                                    <div class="detail-value">331TW</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 1</div>
+                                    <div class="detail-value"><span class="size-badge highlight-yellow">Medium</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 2</div>
+                                    <div class="detail-value">--</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Color Description</div>
+                                    <div class="detail-value">White/Pink</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">NRF Color Code</div>
+                                    <div class="detail-value"><span class="color-code highlight-green">101</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">VPN</div>
+                                    <div class="detail-value">321654987</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Description</div>
+                                    <div class="detail-value">Tanktop Floral</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Label</div>
+                                    <div class="detail-value">1234567890</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Partner</div>
+                                    <div class="detail-value">Billabong (1234)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="match-decision">
+                    <div class="match-question">How do these match?</div>
+                    <select class="match-select">
+                        <option>Choose a level</option>
+                        <option>Exact Match</option>
+                        <option>Close Match</option>
+                        <option>Partial Match</option>
+                        <option>No Match</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <div class="actions-section">
-            <button class="btn btn-outline" onclick="clearSelections()">Clear Selections</button>
-            <button class="btn btn-primary" onclick="submitMatches()">Submit Match Selections</button>
+        <!-- Second Comparison Set -->
+        <div class="comparison-container">
+            <div class="comparison-header">
+                <div>
+                    <div class="upc-info">UPC: 111222333</div>
+                    <!--<div class="brand-name">Mirakl</div> -->
+                </div>
+                <div class="task-info">
+					<div class="task-id">Task ID: MATCH-100</div>
+                    <div class="due-date">Due date: 09/25/2025</div>
+                </div>
+            </div>
+            
+            <div class="comparison-content">
+                <div style="flex: 1;">
+                    <div class="product-row">
+                        <div class="system-label" style="padding: 16px; width: 120px; background: #f0f0f0;">Mirakl</div>
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=80&h=100&fit=crop" alt="Tanktop Floral">
+                        </div>
+                        <div class="product-details">
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">Product ID</div>
+                                    <div class="detail-value">331TW</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 1</div>
+                                    <div class="detail-value"><span class="size-badge">M</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 2</div>
+                                    <div class="detail-value">--</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Color Description</div>
+                                    <div class="detail-value">White</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">NRF Color Code</div>
+                                    <div class="detail-value"><span class="color-code">100</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">VPN</div>
+                                    <div class="detail-value">321654987</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Description</div>
+                                    <div class="detail-value">Tanktop Floral</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Label</div>
+                                    <div class="detail-value">1234567890</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Partner</div>
+                                    <div class="detail-value">Billabong (1234)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-row">
+                        <div class="system-label" style="padding: 16px; width: 120px; background: #f0f0f0;">JWN</div>
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=80&h=100&fit=crop" alt="Tanktop Floral">
+                        </div>
+                        <div class="product-details">
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">Product ID</div>
+                                    <div class="detail-value">331TW</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 1</div>
+                                    <div class="detail-value"><span class="size-badge highlight-yellow">Medium</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Size 2</div>
+                                    <div class="detail-value">--</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Color Description</div>
+                                    <div class="detail-value">White/Pink</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">NRF Color Code</div>
+                                    <div class="detail-value"><span class="color-code highlight-green">101</span></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">VPN</div>
+                                    <div class="detail-value">321654987</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Description</div>
+                                    <div class="detail-value">Tanktop Floral</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Product Label</div>
+                                    <div class="detail-value">1234567890</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Partner</div>
+                                    <div class="detail-value">Billabong (1234)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="match-decision">
+                    <div class="match-question">How do these match?</div>
+                    <select class="match-select">
+                        <option>Choose a level</option>
+                        <option>Exact Match</option>
+                        <option>Close Match</option>
+                        <option>Partial Match</option>
+                        <option>No Match</option>
+                    </select>
+                </div>
+            </div>
         </div>
-
-        <div class="total-items">
-            Total Items: 7
-        </div>
-
-        <div id="matchItemsContainer">
-            <!-- Match items will be populated here -->
-        </div>
-    </div>
+    </main>
 
     <script>
-        const matchItems = [
-            {
-                id: 1,
-                upc: "1234567890",
-                brand: "Misal",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "M",
-                    size2: "--",
-                    colorDesc: "White",
-                    mfrColorCode: "100",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            },
-            {
-                id: 2,
-                upc: "1234567890",
-                brand: "JWN",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "Medium",
-                    size2: "--",
-                    colorDesc: "White-Pink",
-                    mfrColorCode: "101",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            },
-            {
-                id: 3,
-                upc: "1234567890",
-                brand: "Misal",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "M",
-                    size2: "--",
-                    colorDesc: "White",
-                    mfrColorCode: "100",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            },
-            {
-                id: 4,
-                upc: "1234567890",
-                brand: "JWN",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "Medium",
-                    size2: "--",
-                    colorDesc: "White-Pink",
-                    mfrColorCode: "101",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            },
-            {
-                id: 5,
-                upc: "1234567890",
-                brand: "Misal",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "M",
-                    size2: "--",
-                    colorDesc: "White",
-                    mfrColorCode: "100",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            },
-            {
-                id: 6,
-                upc: "1234567890",
-                brand: "JWN",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "Medium",
-                    size2: "--",
-                    colorDesc: "White-Pink",
-                    mfrColorCode: "101",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            },
-            {
-                id: 7,
-                upc: "1234567890",
-                brand: "Misal",
-                productId: "33TTW",
-                taskId: "MATCH-100",
-                dueDate: "09/25/2025",
-                attributes: {
-                    size1: "M",
-                    size2: "--",
-                    colorDesc: "White",
-                    mfrColorCode: "100",
-                    vpn: "321654987",
-                    productDesc: "Tanktop Floral",
-                    productLabel: "1234567890",
-                    partner: "Billabong (1234)"
-                },
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3EImage%3C/text%3E%3C/svg%3E"
-            }
-        ];
-
-        function renderMatchItems() {
-            const container = document.getElementById('matchItemsContainer');
-            container.innerHTML = '';
-
-            matchItems.forEach((item, index) => {
-                const matchDiv = document.createElement('div');
-                matchDiv.className = 'match-item';
-                
-                // Determine attribute highlighting classes based on comparison with first item
-                const baseItem = matchItems[0];
-                const getHighlightClass = (attr, value, baseValue) => {
-                    if (value === baseValue) return 'highlight-exact';
-                    if (value && baseValue && (value.toLowerCase().includes(baseValue.toLowerCase()) || baseValue.toLowerCase().includes(value.toLowerCase()))) {
-                        return 'highlight-partial';
-                    }
-                    return 'highlight-different';
-                };
-
-                matchDiv.innerHTML = `
-                    <div class="match-item-header">
-                        <img src="${item.image}" alt="Product" class="product-image">
-                        <div class="product-info">
-                            <div class="upc-code">UPC: ${item.upc}</div>
-                            <div class="brand-name">${item.brand}</div>
-                        </div>
-                        <div class="task-info">
-                            <div class="task-id">${item.taskId}</div>
-                            <div class="due-date">Due Date<br>${item.dueDate}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="attributes-section">
-                        <div class="attribute-column">
-                            <div class="attribute-header">Product ID</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('productId', item.productId, baseItem.productId) : ''}">${item.productId}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">Size 1</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('size1', item.attributes.size1, baseItem.attributes.size1) : ''}">${item.attributes.size1}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">Size 2</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('size2', item.attributes.size2, baseItem.attributes.size2) : ''}">${item.attributes.size2}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">Color Description</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('colorDesc', item.attributes.colorDesc, baseItem.attributes.colorDesc) : ''}">${item.attributes.colorDesc}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">MFR Color Code</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('mfrColorCode', item.attributes.mfrColorCode, baseItem.attributes.mfrColorCode) : ''}">${item.attributes.mfrColorCode}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">VPN</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('vpn', item.attributes.vpn, baseItem.attributes.vpn) : ''}">${item.attributes.vpn}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">Product Description</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('productDesc', item.attributes.productDesc, baseItem.attributes.productDesc) : ''}">${item.attributes.productDesc}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">Product Label</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('productLabel', item.attributes.productLabel, baseItem.attributes.productLabel) : ''}">${item.attributes.productLabel}</div>
-                        </div>
-                        <div class="attribute-column">
-                            <div class="attribute-header">Partner</div>
-                            <div class="attribute-value ${index > 0 ? getHighlightClass('partner', item.attributes.partner, baseItem.attributes.partner) : ''}">${item.attributes.partner}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="match-controls">
-                        <div class="match-question">How do these match?</div>
-                        <select class="match-select" id="match-${item.id}">
-                            <option value="">Choose a level</option>
-                            <option value="exact">Exact Match</option>
-                            <option value="high">High Match (90-99%)</option>
-                            <option value="medium">Medium Match (70-89%)</option>
-                            <option value="low">Low Match (50-69%)</option>
-                            <option value="no">No Match</option>
-                        </select>
-                    </div>
-                `;
-                
-                container.appendChild(matchDiv);
+        // Handle match selection changes
+        document.querySelectorAll('.match-select').forEach(select => {
+            select.addEventListener('change', function() {
+                console.log('Match decision changed:', this.value);
+                // Here you would typically save the decision to your backend
             });
-        }
+        });
 
-        function clearSelections() {
-            const selects = document.querySelectorAll('.match-select');
-            selects.forEach(select => {
-                select.value = '';
+        // Handle filter changes
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                console.log('Filter changed:', this.closest('.filter-group').querySelector('.filter-label').textContent, this.value);
+                // Here you would typically filter the results
             });
-            
-            // Clear filters
-            document.getElementById('domainFilter').value = '';
-            document.getElementById('dueDateFilter').value = '';
-            document.getElementById('productFilter').value = '';
-            document.getElementById('typeFilter').value = '';
-        }
+        });
 
-        function submitMatches() {
-            const selections = [];
-            const selects = document.querySelectorAll('.match-select');
-            
-            selects.forEach(select => {
-                const itemId = select.id.replace('match-', '');
-                const matchLevel = select.value;
-                if (matchLevel) {
-                    selections.push({
-                        itemId: itemId,
-                        matchLevel: matchLevel
+        // Handle action buttons
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            // Clear all selections
+            document.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            console.log('Selections cleared');
+        });
+
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            // Collect all match decisions
+            const decisions = [];
+            document.querySelectorAll('.match-select').forEach((select, index) => {
+                if (select.value !== 'Choose a level') {
+                    decisions.push({
+                        comparison: index + 1,
+                        decision: select.value
                     });
                 }
             });
-
-            if (selections.length === 0) {
-                alert('Please select match levels for at least one item before submitting.');
+            
+            if (decisions.length === 0) {
+                alert('Please make at least one match decision before submitting.');
                 return;
             }
-
-            console.log('Submitted matches:', selections);
-            alert(`Successfully submitted ${selections.length} match selections!`);
-        }
-
-        // Initialize the page
-        renderMatchItems();
-
-        // Add event listeners for filters
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('filter-select')) {
-                // Filter functionality would go here
-                console.log('Filter changed:', e.target.id, e.target.value);
-            }
+            
+            console.log('Submitting match decisions:', decisions);
+            alert(`Submitted ${decisions.length} match decisions!`);
         });
     </script>
 </body>

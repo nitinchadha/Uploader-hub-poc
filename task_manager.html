@@ -190,10 +190,58 @@
       color: #666;
       font-style: italic;
     }
+	
+	.logo-section {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.logo {
+		font-size: 20px;
+		font-weight: bold;
+		letter-spacing: 2px;
+	}
+
+	.retail-hub {
+		color: #4285f4;
+		font-size: 14px;
+		font-weight: 500;
+	}
+	 .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #666;
+        }
+
+	.breadcrumb {
+		background: white;
+		padding: 12px 24px;
+		border-bottom: 1px solid #e0e0e0;
+		font-size: 14px;
+		color: #666;
+	}
+	
   </style>
 </head>
 <body>
+ <header class="header">
+        <div class="logo-section">
+            <div class="logo">NORDSTROM</div>
+            <div class="retail-hub"><a href="index.html">RETAIL HUB</a></div>
+        </div>
+        <div class="header-actions">
+            <span>🔔</span>
+            <span>❓</span>
+            <span>⋮</span>
+            <span>👤</span>
+        </div>
+    </header>
 
+    <div class="breadcrumb">
+        ≡  <a href="index.html">Retail Hub</a> | Task Manager
+    </div>
   <div class="container">
     <!-- Header Section -->
     <div class="header">
@@ -229,7 +277,7 @@
       <select id="bulkAssignSelect">
         <option value="">Assign to...</option>
         <option value="myself">Myself</option>
-        <option value="john-doe">John Doe</option>
+        <option value="john-doe">Nitin Chadha</option>
         <option value="mary-johnson">Mary Johnson</option>
         <option value="steve-brown">Steve Brown</option>
         <option value="jane-smith">Jane Smith</option>
@@ -262,7 +310,7 @@
         <tbody id="readyToClaimTasks">
           <tr>
             <td><input type="checkbox" class="task-checkbox" data-task-id="104"></td>
-            <td>100</td>
+            <td>104</td>
             <td>Unassigned</td>
             <td>2023-10-05</td>
             <td>Admin</td>
@@ -542,4 +590,3 @@
 
 </body>
 </html>
-

@@ -45,6 +45,7 @@
       color: #fff;
       cursor: pointer;
       font-size: 14px;
+      margin-left: 5px;
     }
 
     .header button:hover {
@@ -65,6 +66,11 @@
       color: #333;
       cursor: pointer;
       font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .tabs button:hover {
+      background: #f0f0f0;
     }
 
     .tabs button.active {
@@ -110,6 +116,80 @@
       font-size: 14px;
       cursor: pointer;
     }
+
+    .filters .reset-button:hover {
+      background: #e8e8ec;
+    }
+
+    .task-name-link {
+      color: #6c63ff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .task-name-link:hover {
+      text-decoration: underline;
+    }
+
+    .bulk-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .bulk-actions select, .bulk-actions button {
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .bulk-actions button {
+      background: #6c63ff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .bulk-actions button:hover {
+      background: #4e4bdf;
+    }
+
+    .bulk-actions button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .assign-cell {
+      min-width: 120px;
+    }
+
+    .assign-select {
+      padding: 4px 6px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 12px;
+      width: 100%;
+    }
+
+    .checkbox-cell {
+      width: 40px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .no-tasks {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -122,17 +202,17 @@
         <p>These are tasks for apps and groups you belong to</p>
       </div>
       <div>
-        <button>Export CSV</button>
-        <button>Create Task</button>
+        <button onclick="exportCSV()">Export CSV</button>
+        <button onclick="createTask()">Create Task</button>
       </div>
     </div>
 
     <!-- Tabs Section -->
     <div class="tabs">
-      <button class="active">Ready To Claim</button>
-      <button>All</button>
-      <button>Your Tasks</button>
-      <button>Created By Me</button>
+      <button class="active" onclick="switchTab('ready-to-claim')">Ready To Claim</button>
+      <button onclick="switchTab('all')">All</button>
+      <button onclick="switchTab('your-tasks')">Your Tasks</button>
+      <button onclick="switchTab('created-by-me')">Created By Me</button>
     </div>
 
     <!-- Filters Section -->
@@ -140,66 +220,325 @@
       <div>
         <span>Filter by status, priority, or assigned user:</span>
       </div>
-      <button class="reset-button">Reset All Filters</button>
+      <button class="reset-button" onclick="resetFilters()">Reset All Filters</button>
     </div>
 
-    <!-- Table Section -->
-    <table>
-      <thead>
-        <tr>
-          <th>Task ID</th>
-          <th>Assigned To</th>
-          <th>Created At</th>
-          <th>Created By</th>
-          <th>Status</th>
-          <th>Task Type</th>
-          <th>Name</th>
-          <th>Priority</th>
-          <th>Due Date</th>
-          <th>Last Updated By</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Dummy Rows -->
-        <tr>
-          <td>101</td>
-          <td>John Doe</td>
-          <td>2023-10-01</td>
-          <td>Jane Smith</td>
-          <td>In Progress</td>
-          <td>Bug Fix</td>
-          <td>Fix Login Issue</td>
-          <td>High</td>
-          <td>2023-10-10</td>
-          <td>Admin</td>
-        </tr>
-        <tr>
-          <td>102</td>
-          <td>Mary Johnson</td>
-          <td>2023-09-25</td>
-          <td>Admin</td>
-          <td>Completed</td>
-          <td>Feature Development</td>
-          <td>Add Dark Mode</td>
-          <td>Medium</td>
-          <td>2023-09-30</td>
-          <td>Admin</td>
-        </tr>
-        <tr>
-          <td>103</td>
-          <td>Steve Brown</td>
-          <td>2023-10-03</td>
-          <td>Jane Smith</td>
-          <td>Not Started</td>
-          <td>Testing</td>
-          <td>Cover Payment Gateway</td>
-          <td>Low</td>
-          <td>2023-10-15</td>
-          <td>Steve Brown</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Bulk Actions -->
+    <div class="bulk-actions">
+      <span>Selected tasks:</span>
+      <select id="bulkAssignSelect">
+        <option value="">Assign to...</option>
+        <option value="myself">Myself</option>
+        <option value="john-doe">John Doe</option>
+        <option value="mary-johnson">Mary Johnson</option>
+        <option value="steve-brown">Steve Brown</option>
+        <option value="jane-smith">Jane Smith</option>
+      </select>
+      <button id="bulkAssignBtn" onclick="bulkAssign()" disabled>Assign Selected</button>
+      <span id="selectedCount">0 selected</span>
+    </div>
+
+    <!-- Ready To Claim Tab -->
+    <div id="ready-to-claim" class="tab-content active">
+      <table>
+        <thead>
+          <tr>
+            <th class="checkbox-cell">
+              <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+            </th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Created At</th>
+            <th>Created By</th>
+            <th>Status</th>
+            <th>Task Type</th>
+            <th>Name</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Last Updated By</th>
+            <th class="assign-cell">Quick Assign</th>
+          </tr>
+        </thead>
+        <tbody id="readyToClaimTasks">
+          <tr>
+            <td><input type="checkbox" class="task-checkbox" data-task-id="104"></td>
+            <td>104</td>
+            <td>Unassigned</td>
+            <td>2023-10-05</td>
+            <td>Admin</td>
+            <td>Ready</td>
+            <td>Bug Fix</td>
+            <td><a href="partial-match.html" class="task-name-link">Fix Header Alignment</a></td>
+            <td>High</td>
+            <td>2023-10-12</td>
+            <td>Admin</td>
+            <td class="assign-cell">
+              <select class="assign-select" onchange="assignTask(104, this.value)">
+                <option value="">Assign to...</option>
+                <option value="myself">Myself</option>
+                <option value="john-doe">John Doe</option>
+                <option value="mary-johnson">Mary Johnson</option>
+                <option value="steve-brown">Steve Brown</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="task-checkbox" data-task-id="105"></td>
+            <td>105</td>
+            <td>Unassigned</td>
+            <td>2023-10-06</td>
+            <td>Jane Smith</td>
+            <td>Ready</td>
+            <td>Feature Development</td>
+            <td><a href="partial_match.html" class="task-name-link">Add User Profile Page</a></td>
+            <td>Medium</td>
+            <td>2023-10-18</td>
+            <td>Jane Smith</td>
+            <td class="assign-cell">
+              <select class="assign-select" onchange="assignTask(105, this.value)">
+                <option value="">Assign to...</option>
+                <option value="myself">Myself</option>
+                <option value="john-doe">John Doe</option>
+                <option value="mary-johnson">Mary Johnson</option>
+                <option value="steve-brown">Steve Brown</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- All Tasks Tab -->
+    <div id="all" class="tab-content">
+      <table>
+        <thead>
+          <tr>
+            <th class="checkbox-cell">
+              <input type="checkbox" id="selectAllTasks" onchange="toggleSelectAll()">
+            </th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Created At</th>
+            <th>Created By</th>
+            <th>Status</th>
+            <th>Task Type</th>
+            <th>Name</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Last Updated By</th>
+            <th class="assign-cell">Quick Assign</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" class="task-checkbox" data-task-id="101"></td>
+            <td>101</td>
+            <td>John Doe</td>
+            <td>2023-10-01</td>
+            <td>Jane Smith</td>
+            <td>In Progress</td>
+            <td>Bug Fix</td>
+            <td><a href="partial_match.html" class="task-name-link">Fix Login Issue</a></td>
+            <td>High</td>
+            <td>2023-10-10</td>
+            <td>Admin</td>
+            <td class="assign-cell">
+              <select class="assign-select" onchange="assignTask(101, this.value)">
+                <option value="">Assign to...</option>
+                <option value="myself">Myself</option>
+                <option value="john-doe" selected>John Doe</option>
+                <option value="mary-johnson">Mary Johnson</option>
+                <option value="steve-brown">Steve Brown</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="task-checkbox" data-task-id="102"></td>
+            <td>102</td>
+            <td>Mary Johnson</td>
+            <td>2023-09-25</td>
+            <td>Admin</td>
+            <td>Completed</td>
+            <td>Feature Development</td>
+            <td><a href="partial_match.html" class="task-name-link">Add Dark Mode</a></td>
+            <td>Medium</td>
+            <td>2023-09-30</td>
+            <td>Admin</td>
+            <td class="assign-cell">
+              <select class="assign-select" onchange="assignTask(102, this.value)">
+                <option value="">Assign to...</option>
+                <option value="myself">Myself</option>
+                <option value="john-doe">John Doe</option>
+                <option value="mary-johnson" selected>Mary Johnson</option>
+                <option value="steve-brown">Steve Brown</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="task-checkbox" data-task-id="103"></td>
+            <td>103</td>
+            <td>Steve Brown</td>
+            <td>2023-10-03</td>
+            <td>Jane Smith</td>
+            <td>Not Started</td>
+            <td>Testing</td>
+            <td><a href="partial_match.html" class="task-name-link">Cover Payment Gateway</a></td>
+            <td>Low</td>
+            <td>2023-10-15</td>
+            <td>Steve Brown</td>
+            <td class="assign-cell">
+              <select class="assign-select" onchange="assignTask(103, this.value)">
+                <option value="">Assign to...</option>
+                <option value="myself">Myself</option>
+                <option value="john-doe">John Doe</option>
+                <option value="mary-johnson">Mary Johnson</option>
+                <option value="steve-brown" selected>Steve Brown</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Your Tasks Tab -->
+    <div id="your-tasks" class="tab-content">
+      <div class="no-tasks">
+        You don't have any assigned tasks yet.
+      </div>
+    </div>
+
+    <!-- Created By Me Tab -->
+    <div id="created-by-me" class="tab-content">
+      <div class="no-tasks">
+        You haven't created any tasks yet.
+      </div>
+    </div>
   </div>
+
+  <script>
+    // Tab switching functionality
+    function switchTab(tabName) {
+      // Remove active class from all tabs and content
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      // Add active class to clicked tab
+      event.target.classList.add('active');
+      
+      // Show corresponding content
+      document.getElementById(tabName).classList.add('active');
+      
+      // Reset checkbox selections when switching tabs
+      resetCheckboxes();
+    }
+
+    // Checkbox selection functionality
+    function toggleSelectAll() {
+      const activeTab = document.querySelector('.tab-content.active');
+      const checkboxes = activeTab.querySelectorAll('.task-checkbox');
+      const selectAllCheckbox = activeTab.querySelector('input[type="checkbox"]');
+      
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+      
+      updateSelectedCount();
+    }
+
+    function resetCheckboxes() {
+      document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        if (checkbox.id.includes('selectAll')) {
+          checkbox.checked = false;
+        }
+      });
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const activeTab = document.querySelector('.tab-content.active');
+      const selectedCheckboxes = activeTab.querySelectorAll('.task-checkbox:checked');
+      const count = selectedCheckboxes.length;
+      
+      document.getElementById('selectedCount').textContent = `${count} selected`;
+      document.getElementById('bulkAssignBtn').disabled = count === 0;
+    }
+
+    // Add event listeners to checkboxes
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('task-checkbox')) {
+        updateSelectedCount();
+        
+        // Update "select all" checkbox state
+        const activeTab = document.querySelector('.tab-content.active');
+        const checkboxes = activeTab.querySelectorAll('.task-checkbox');
+        const checkedBoxes = activeTab.querySelectorAll('.task-checkbox:checked');
+        const selectAllCheckbox = activeTab.querySelector('input[type="checkbox"]');
+        
+        if (selectAllCheckbox) {
+          selectAllCheckbox.checked = checkboxes.length === checkedBoxes.length;
+          selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+        }
+      }
+    });
+
+    // Assignment functionality
+    function assignTask(taskId, assignee) {
+      if (!assignee) return;
+      
+      const assigneeName = assignee === 'myself' ? 'You' : assignee.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      
+      // Find the task row and update the "Assigned To" column
+      const taskRow = document.querySelector(`input[data-task-id="${taskId}"]`).closest('tr');
+      const assignedToCell = taskRow.cells[2]; // "Assigned To" column
+      assignedToCell.textContent = assigneeName;
+      
+      // Update status if it was unassigned
+      const statusCell = taskRow.cells[5]; // "Status" column
+      if (statusCell.textContent === 'Ready') {
+        statusCell.textContent = 'Assigned';
+      }
+      
+      alert(`Task ${taskId} has been assigned to ${assigneeName}`);
+    }
+
+    function bulkAssign() {
+      const assignee = document.getElementById('bulkAssignSelect').value;
+      if (!assignee) return;
+      
+      const activeTab = document.querySelector('.tab-content.active');
+      const selectedCheckboxes = activeTab.querySelectorAll('.task-checkbox:checked');
+      
+      selectedCheckboxes.forEach(checkbox => {
+        const taskId = checkbox.getAttribute('data-task-id');
+        const selectElement = checkbox.closest('tr').querySelector('.assign-select');
+        selectElement.value = assignee;
+        assignTask(parseInt(taskId), assignee);
+      });
+      
+      // Reset selections
+      resetCheckboxes();
+      document.getElementById('bulkAssignSelect').value = '';
+    }
+
+    // Other functionality
+    function exportCSV() {
+      alert('CSV export functionality would be implemented here');
+    }
+
+    function createTask() {
+      alert('Create task dialog would open here');
+    }
+
+    function resetFilters() {
+      alert('All filters have been reset');
+    }
+
+    // Initialize
+    updateSelectedCount();
+  </script>
 
 </body>
 </html>

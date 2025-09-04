@@ -382,54 +382,39 @@
                     </a>
                     
                     <a href="#" class="app-item">
-                        <div class="app-icon">💰</div>
+                        <div class="app-icon">$</div>
                         <div class="app-name">Cost Management</div>
                         <div class="info-icon">i</div>
                     </a>
                     
+                   
                     <a href="#" class="app-item">
-                        <div class="app-icon">🔗</div>
-                        <div class="app-name">Hierarchies</div>
-                        <div class="info-icon">i</div>
-                    </a>
-                    
-                    <a href="#" class="app-item">
-                        <div class="app-icon">📱</div>
+                        <div class="app-icon">🛒</div>
                         <div class="app-name">Product Display</div>
                         <div class="info-icon">i</div>
                     </a>
                     
-                    <a href="#" class="app-item">
-                        <div class="app-icon">🔍</div>
-                        <div class="app-name">Product Search</div>
-                        <div class="info-icon">i</div>
-                    </a>
+                   
                 </div>
 
                 <div class="divider"></div>
 
-                <div class="category-header" onclick="toggleCategory('admin')">
-                    <div class="category-title">Admin</div>
-                    <button class="category-toggle" id="planning-toggle">▼</button>
+                <div class="category-header" onclick="toggleCategory('planning')">
+                    <div class="category-title">Planning</div>
+                    <button class="category-toggle " id="planning-toggle">▼</button>
                 </div>
                 
-               <div class="category-apps category-collapsed" id="planning-apps">
-                    <a href="task_manager.html" class="app-item">
-                        <div class="app-icon"> ✔ </div>
-                        <div class="app-name">Task Manager</div>
-                        <div class="info-icon">i</div>
-                    </a>
-                    
-                    <a href="#" class="app-item">
-                        <div class="app-icon">📋</div>
-                        <div class="app-name">Manage Notification</div>
+				<div class="category-apps category-collapsed" id="planning-apps">
+                     <a href="offerdetail.html" class="app-item">
+                        <div class="app-icon">🔍</div>
+                        <div class="app-name">Product Selection App</div>
                         <div class="info-icon">i</div>
                     </a>
                 </div>
-
+				<!--
                 <div class="divider"></div>
 
-                 <!--<div class="category-header" onclick="toggleCategory('supply-chain')">
+                <div class="category-header" onclick="toggleCategory('supply-chain')">
                     <div class="category-title">Supply Chain</div>
                     <button class="category-toggle" id="supply-chain-toggle">▼</button>
                 </div>
@@ -512,16 +497,16 @@
                 </div>
 
                 <div class="divider"></div>
-  				-->
+				-->
                 <div class="category-header" onclick="toggleCategory('admin')">
                     <div class="category-title">Admin</div>
                     <button class="category-toggle" id="admin-toggle">▼</button>
                 </div>
-              
+
                 <div class="category-apps category-collapsed" id="admin-apps">
-                    <a href="#" class="app-item">
-                        <div class="app-icon">⚙️</div>
-                        <div class="app-name">Settings</div>
+                    <a href="task_manager.html" class="app-item">
+                        <div class="app-icon"> ✔ </div>
+                        <div class="app-name">Task Manager</div>
                         <div class="info-icon">i</div>
                     </a>
                     
@@ -531,17 +516,13 @@
                         <div class="info-icon">i</div>
                     </a>
                     
-                    <a href="excel_uploader.html" class="app-item">
-                        <div class="app-icon">📤</div>
-                        <div class="app-name">File Uploader</div>
-                        <div class="info-icon">i</div>
-                    </a>
+                   
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
+     <script>
         function toggleCategory(categoryId) {
             const appsElement = document.getElementById(categoryId + '-apps');
             const toggleElement = document.getElementById(categoryId + '-toggle');
@@ -571,16 +552,20 @@
         });
 
         // Add hover effects and click handlers
-        //document.querySelectorAll('.app-item').forEach(item => {
-          //  item.addEventListener('click', function(e) {
-                // If it's not the File Uploader, prevent default and show coming soon
-            //    if (!this.href.includes('excel_uploader.html')) {
-              //      e.preventDefault();
-                //    const appName = this.querySelector('.app-name').textContent;
-                  //  alert(`${appName} - Coming Soon!`);
-                //}
-            //});
-        });
+        document.querySelectorAll('.app-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        const href = this.href || '';
+        const isAvailable = href.includes('uploader-hub.html') || 
+                           href.includes('task_manager.html') || 
+                           href.includes('offerdetail.html');
+        
+        if (!isAvailable) {
+            e.preventDefault();
+            const appName = this.querySelector('.app-name').textContent;
+            alert(`${appName} - Coming Soon!`);
+        }
+    });
+});
     </script>
 </body>
 </html>

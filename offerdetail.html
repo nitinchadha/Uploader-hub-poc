@@ -6,52 +6,106 @@
   <title>Offer Details</title>
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      box-sizing: border-box;
     }
 
     body {
-      background-color: #f4f4f9;
-      margin: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      margin: 0;
+      padding: 0;
     }
 
-    .container {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Header Section */
     .header {
+      background: white;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e1e5e9;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
     }
 
-    .header h1 {
-      font-size: 18px;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .retail-hub {
+      color: #4285f4;
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .header-actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
+      align-items: center;
     }
 
-    .header-actions button, .header-actions select {
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background: #0066cc;
-      color: white;
+    .btn-outline {
+      background: white;
+      color: #0066cc;
+      border: 2px solid #0066cc;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
       font-size: 14px;
     }
 
-    .header-actions button:hover {
-      background-color: #4e4bdf;
+    .btn-primary {
+      background: #0066cc;
+      color: white;
+      border: 2px solid #0066cc;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .btn-primary:hover {
+      background: #0052a3;
+      border-color: #0052a3;
+    }
+
+    .container {
+      /* expand to align with header horizontal padding (40px each side)
+         use full viewport width minus header padding so content aligns */
+      width: calc(100% - 80px);
+      margin: 20px 40px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .breadcrumb {
+      background: white;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+      color: #666;
     }
 
     /* Summary Info */
@@ -84,9 +138,7 @@
       font-size: 14px;
     }
 
-    .filters span {
-      margin-right: 15px;
-    }
+    .filters span { margin-right: 15px; }
 
     .filters select {
       padding: 8px;
@@ -94,7 +146,7 @@
       border-radius: 5px;
     }
 
-    /* Data Table */
+    /* Table */
     table {
       margin-top: 20px;
       width: 100%;
@@ -102,96 +154,43 @@
       font-size: 12px;
     }
 
-    table th, table td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
+    table th, table td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+    table th { background-color: #f0f4ff; font-weight: bold; }
+    table tbody tr:nth-child(even) { background: #f9f9f9; }
+    .warning-cell { background-color: #ffeeba; color: #856404; }
 
-    table th {
-      background-color: #f0f4ff;
-      font-weight: bold;
-    }
-
-    table tbody tr:nth-child(even) {
-      background: #f9f9f9;
-    }
-
-    .warning-cell {
-      background-color: #ffeeba;
-      color: #856404;
-    }
-	.btn-primary {
-		background: #0066cc;
-		color: white;
-		border: 2px solid #0066cc;
-		padding: 10px 20px;
-		border-radius: 6px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s;
-		text-decoration: none;
-		font-size: 14px;
-	}
-
-	.header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
     /* Tabs */
-    .tabs {
-        margin-top: 20px;
-        border-bottom: 1px solid #e6e6ef;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .tab-list {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .tab {
-        padding: 8px 14px;
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 6px 6px 0 0;
-        cursor: pointer;
-        font-size: 14px;
-        color: #333;
-    }
-
-    .tab[aria-selected="true"], .tab.active {
-        background: #f0f4ff;
-        border-color: #cfe0ff;
-        color: #003366;
-        font-weight: 600;
-    }
-
-    .tab-panels {
-        padding: 16px 0 0 0;
-    }
-
-    .tab-panel {
-        display: none;
-    }
-
-    .tab-panel.active {
-        display: block;
-    }
+    .tabs { margin-top: 20px; border-bottom: 1px solid #e6e6ef; display: flex; flex-direction: column; gap: 10px; }
+    .tab-list { display: flex; gap: 8px; align-items: center; }
+    .tab { padding: 8px 14px; background: transparent; border: 1px solid transparent; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 14px; color: #333; }
+    .tab[aria-selected="true"], .tab.active { background: #f0f4ff; border-color: #cfe0ff; color: #003366; font-weight: 600; }
+    .tab-panels { padding: 16px 0 0 0; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
   </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <button class="back-btn" onclick="goBack()">
-                ← Back to Dashboard
-            </button>
-        </div>
-	</div>
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo">NORDSTROM</div>
+        <div class="retail-hub"><a href="index.html">RETAIL HUB</a></div>
+      </div>
+      <div class="header-actions">
+        <span title="Notifications">🔔</span>
+        <span title="Help">❓</span>
+        <span title="More">⋮</span>
+        <span title="Profile">👤</span>
+      </div>
+    </header>
+
+    <div class="header" style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display:flex; align-items:center; gap:24px;">
+  <div class="breadcrumb" style="background:none; border-bottom:none; padding:0; font-size:16px; color:#333;"><b>Offer Details</b></div>
+      </div>
+      <div class="header-actions" style="display:flex; gap:12px;">
+        <!-- Back to Dashboard button removed as requested -->
+      </div>
+    </div>
   <div class="container">
     <!-- Header Section -->
     <div class="header">

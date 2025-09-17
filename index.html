@@ -369,30 +369,29 @@
                 </div>
                 
                 <div class="category-apps" id="products-apps">
-                   <a href="uploader-hub.html" class="app-item">
-                        <div class="app-icon">⬆️</div>
-                        <div class="app-name">Uploader Hub</div>
-                        <div class="info-icon">i</div>
-						
-                    </a>
-				   <a href="#" class="app-item">
-                        <div class="app-icon">📋</div>
-                        <div class="app-name">Catalogs</div>
-                        <div class="info-icon">i</div>
-                    </a>
-                    
-                    <a href="#" class="app-item">
-                        <div class="app-icon">$</div>
-                        <div class="app-name">Cost Management</div>
-                        <div class="info-icon">i</div>
-                    </a>
-                    
-                   
-                    <a href="#" class="app-item">
-                        <div class="app-icon">🛒</div>
-                        <div class="app-name">Product Display</div>
-                        <div class="info-icon">i</div>
-                    </a>
+                <a href="uploader-hub.html" class="app-item" data-available="true">
+                    <div class="app-icon">⬆️</div>
+                    <div class="app-name">Uploader Hub</div>
+                    <div class="info-icon">i</div>
+                </a>
+                <a href="taxonomy.html" class="app-item" data-available="true">
+                    <div class="app-icon">📋</div>
+                    <div class="app-name">Taxonomy</div>
+                    <div class="info-icon">i</div>
+                </a>
+                
+                <a href="#" class="app-item" data-available="false">
+                    <div class="app-icon">$</div>
+                    <div class="app-name">Cost Management</div>
+                    <div class="info-icon">i</div>
+                </a>
+                
+                
+                <a href="#" class="app-item" data-available="false">
+                    <div class="app-icon">🛒</div>
+                    <div class="app-name">Product Display</div>
+                    <div class="info-icon">i</div>
+                </a>
                     
                    
                 </div>
@@ -405,7 +404,7 @@
                 </div>
                 
 				<div class="category-apps category-collapsed" id="planning-apps">
-                     <a href="offerdetail.html" class="app-item">
+                    <a href="offerdetail.html" class="app-item" data-available="false">
                         <div class="app-icon">🔍</div>
                         <div class="app-name">Product Selection App</div>
                         <div class="info-icon">i</div>
@@ -504,13 +503,13 @@
                 </div>
 
                 <div class="category-apps category-collapsed" id="admin-apps">
-                    <a href="task_manager.html" class="app-item">
+                    <a href="task_manager.html" class="app-item" data-available="true">
                         <div class="app-icon"> ✔ </div>
                         <div class="app-name">Task Manager</div>
                         <div class="info-icon">i</div>
                     </a>
                     
-                    <a href="#" class="app-item">
+                    <a href="#" class="app-item" data-available="false">
                         <div class="app-icon">👥</div>
                         <div class="app-name">User Management</div>
                         <div class="info-icon">i</div>
@@ -551,14 +550,10 @@
             });
         });
 
-        // Add hover effects and click handlers
-        document.querySelectorAll('.app-item').forEach(item => {
+// Add hover effects and click handlers
+document.querySelectorAll('.app-item').forEach(item => {
     item.addEventListener('click', function(e) {
-        const href = this.href || '';
-        const isAvailable = href.includes('uploader-hub.html') || 
-                           href.includes('task_manager.html') || 
-                           href.includes('offerdetail.html');
-        
+        const isAvailable = this.getAttribute('data-available') === 'true';
         if (!isAvailable) {
             e.preventDefault();
             const appName = this.querySelector('.app-name').textContent;

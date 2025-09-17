@@ -139,6 +139,49 @@
             align-items: center;
             gap: 20px;
         }
+    /* Tabs */
+    .tabs {
+        margin-top: 20px;
+        border-bottom: 1px solid #e6e6ef;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tab-list {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .tab {
+        padding: 8px 14px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px 6px 0 0;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .tab[aria-selected="true"], .tab.active {
+        background: #f0f4ff;
+        border-color: #cfe0ff;
+        color: #003366;
+        font-weight: 600;
+    }
+
+    .tab-panels {
+        padding: 16px 0 0 0;
+    }
+
+    .tab-panel {
+        display: none;
+    }
+
+    .tab-panel.active {
+        display: block;
+    }
   </style>
 </head>
 <body>
@@ -183,6 +226,50 @@
       <span>Exact Matches: 11</span>
       <span>Partial Matches: 1</span>
       <span>No Matches: 0</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Offer sections">
+      <div class="tab-list">
+        <button class="tab" role="tab" aria-selected="true" data-panel="panel-offer">Offer Details</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="panel-match">Match Items</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="panel-channel">Channel Distribution</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="panel-size">Size Curve</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="panel-shop">Shop Windows</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="panel-corp">Corp Cluster</button>
+      </div>
+
+      <div class="tab-panels">
+        <div id="panel-offer" class="tab-panel active" role="tabpanel">
+          <h3>Offer Details</h3>
+          <p>Summary and metadata about the offer appear here.</p>
+        </div>
+
+        <div id="panel-match" class="tab-panel" role="tabpanel">
+          <h3>Match Items</h3>
+          <p>Matched items and matching details will be shown here.</p>
+        </div>
+
+        <div id="panel-channel" class="tab-panel" role="tabpanel">
+          <h3>Channel Distribution</h3>
+          <p>Channel distribution charts or tables go here.</p>
+        </div>
+
+        <div id="panel-size" class="tab-panel" role="tabpanel">
+          <h3>Size Curve</h3>
+          <p>Size curve and size breakdown information.</p>
+        </div>
+
+        <div id="panel-shop" class="tab-panel" role="tabpanel">
+          <h3>Shop Windows</h3>
+          <p>Shop window scheduling and details.</p>
+        </div>
+
+        <div id="panel-corp" class="tab-panel" role="tabpanel">
+          <h3>Corp Cluster</h3>
+          <p>Corporate cluster mapping and info.</p>
+        </div>
+      </div>
     </div>
 
     <!-- Table Section -->
@@ -249,6 +336,61 @@
 	 function goBack() {
             window.history.back();
         }
+
+    // Tab switching
+    (function() {
+      function activateTab(tab) {
+        if (!tab) return;
+        const allTabs = document.querySelectorAll('.tab');
+        if (!allTabs || allTabs.length === 0) return;
+
+        // deactivate all tabs
+        allTabs.forEach(t => {
+          if (t) {
+            t.setAttribute('aria-selected', 'false');
+            t.classList.remove('active');
+          }
+        });
+
+        // hide all panels
+        const allPanels = document.querySelectorAll('.tab-panel');
+        if (allPanels && allPanels.length > 0) {
+          allPanels.forEach(p => {
+            if (p) p.classList.remove('active');
+          });
+        }
+
+        // activate
+        tab.setAttribute('aria-selected', 'true');
+        tab.classList.add('active');
+        const panelId = tab.getAttribute('data-panel');
+        if (panelId) {
+          const panel = document.getElementById(panelId);
+          if (panel) panel.classList.add('active');
+        }
+      }
+
+      const tabElements = document.querySelectorAll('.tab');
+      if (tabElements && tabElements.length > 0) {
+        tabElements.forEach(tab => {
+          tab.addEventListener('click', () => activateTab(tab));
+          tab.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+              const tabs = Array.from(document.querySelectorAll('.tab'));
+              const idx = tabs.indexOf(tab);
+              if (tabs.length === 0 || idx === -1) return;
+              const next = e.key === 'ArrowRight'
+                ? tabs[(idx + 1) % tabs.length]
+                : tabs[(idx - 1 + tabs.length) % tabs.length];
+              if (next) {
+                next.focus();
+                activateTab(next);
+              }
+            }
+          });
+        });
+      }
+    })();
 	</script>
 </body>
 </html>

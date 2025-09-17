@@ -13,7 +13,7 @@
         .retail-hub a { color: #4285f4; font-size:14px; font-weight:500; text-decoration:none }
         .header-actions { display:flex; gap:12px; align-items:center }
         .breadcrumb { background: white; padding: 12px 24px; border-bottom: 1px solid #e0e0e0; font-size: 14px; color: #666; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius:8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .container { width: 100%; margin: 12px 0; padding: 16px 24px; background: white; border-radius:8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -41,8 +41,498 @@
     </div>
 
     <div class="container">
-        <h1 style="font-size:20px; margin-bottom:12px;">Taxonomy</h1>
-        <p>This is a placeholder page. Add taxonomy content here.</p>
+    <!-- Page title and placeholder removed as requested -->
+                <!-- Taxonomy grid (interactive) -->
+                <div style="margin-top:20px;">
+                    <h2 style="font-size:16px; margin-bottom:8px;">Attribute Taxonomy</h2>
+
+                    <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+                        <input id="searchInput" type="search" placeholder="Search attribute, label, description or example..." style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:6px;" />
+                    </div>
+
+                    <!-- summary counts + column visibility controls -->
+                    <div id="summaryPanel" style="display:flex; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+                        <!-- populated by JS -->
+                    </div>
+
+                    <!-- column visibility controls -->
+                    <div id="columnControls" style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+                        <label style="font-size:13px; color:#444; margin-right:8px;">Columns:</label>
+                        <label><input type="checkbox" data-col="code" checked /> attribute-code</label>
+                        <label><input type="checkbox" data-col="label" checked /> label</label>
+                        <label><input type="checkbox" data-col="description" checked /> description</label>
+                        <label><input type="checkbox" data-col="example" checked /> example</label>
+                        <label><input type="checkbox" data-col="valueCode" checked /> value-code</label>
+                        <label><input type="checkbox" data-col="valueLabel" checked /> value-label</label>
+                    </div>
+
+                    <div style="overflow:auto; border:1px solid #e6e6ef; border-radius:6px; background:white; width:100%;">
+                        <table id="taxonomyTable" style="width:100%; border-collapse:collapse; min-width:0;">
+                            <thead style="background:#f8f9ff;">
+                                <tr>
+                                    <th style="width:36px; padding:12px; border-bottom:1px solid #eaeef7;"> </th>
+                                    <th data-key="code" data-col="code" style="text-align:left; padding:12px; border-bottom:1px solid #eaeef7; cursor:pointer;">attribute-code <span class="sort-ind"/></th>
+                                    <th data-key="label" data-col="label" style="text-align:left; padding:12px; border-bottom:1px solid #eaeef7; cursor:pointer;">label <span class="sort-ind"/></th>
+                                    <th data-key="description" data-col="description" style="text-align:left; padding:12px; border-bottom:1px solid #eaeef7; cursor:pointer;">description <span class="sort-ind"/></th>
+                                    <th data-key="example" data-col="example" style="text-align:left; padding:12px; border-bottom:1px solid #eaeef7; cursor:pointer;">example <span class="sort-ind"/></th>
+                                    <th data-key="valueCode" data-col="valueCode" style="text-align:left; padding:12px; border-bottom:1px solid #eaeef7; cursor:pointer;">value-code <span class="sort-ind"/></th>
+                                    <th data-key="valueLabel" data-col="valueLabel" style="text-align:left; padding:12px; border-bottom:1px solid #eaeef7; cursor:pointer;">value-label <span class="sort-ind"/></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- rows rendered by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; width:100%;">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <label style="font-size:14px; color:#555;">Page size:
+                                            <select id="pageSizeSelect" style="margin-left:6px; padding:6px; border-radius:6px;">
+                                                <option value="5">5</option>
+                                                <option value="10" selected>10</option>
+                                                <option value="20">20</option>
+                                            </select>
+                                        </label>
+                                    </div>
+
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <button id="firstBtn" style="padding:6px 10px;">« First</button>
+                                        <button id="prevBtn" style="padding:6px 10px;">‹ Prev</button>
+                                        <div id="pageButtons" style="display:flex; gap:6px; align-items:center;"></div>
+                                        <button id="nextBtn" style="padding:6px 10px;">Next ›</button>
+                                        <button id="lastBtn" style="padding:6px 10px;">Last »</button>
+                                    </div>
+
+                                    <div id="rowsInfo" style="font-size:13px; color:#666;"></div>
+                                </div>
+                </div>
+
+                <style>
+                    /* small table helpers */
+                    #taxonomyTable tbody tr:nth-child(even) { background:#fbfdff; }
+                    #taxonomyTable tr.parent-highlight { background: #fff4d9; }
+                    #taxonomyTable td { padding:10px; border-top:1px solid #f1f4fb; vertical-align:top; }
+                    /* caret column and child row styles */
+                    .caret-btn { background:transparent; border:none; cursor:pointer; font-size:14px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; }
+                    .caret-icon { display:inline-block; transition:transform 0.15s ease; }
+                    .caret-collapsed .caret-icon { transform: rotate(-90deg); }
+                    .child-row td { padding-left:36px; color:#444; font-size:13px; background:#fbfeff; }
+                    .sort-ind { font-size:12px; margin-left:6px; color:#888; }
+                    .sort-asc::after { content: ' ▲'; }
+                    .sort-desc::after { content: ' ▼'; }
+                    /* edit styles */
+                    .edit-parent-btn, .edit-child-btn { background:transparent; border:none; cursor:pointer; margin-left:8px; color:#0066cc; }
+                    .edit-input { padding:6px 8px; border:1px solid #dcdfe8; border-radius:6px; font-size:13px; width:100%; box-sizing:border-box; }
+                    .save-parent-btn, .cancel-parent-btn, .save-child-btn, .cancel-child-btn { padding:6px 8px; margin-left:6px; border-radius:6px; border:1px solid #d0d7e6; background:white; cursor:pointer; }
+                </style>
+
+                <script>
+                    (function(){
+                        // data (support children array on items)
+                            const data = [
+                                {code:'activity', label:'Activity', description:'Describes the sports/activities the product is appropriate for.', example:'Running', children:[
+                                {code:'activity_athleisure', label:'Athleisure', description:'', example:'', valueCode:'athleisure', valueLabel:'Athleisure'},
+                                {code:'activity_baseball', label:'Baseball', description:'', example:'', valueCode:'baseball', valueLabel:'Baseball'},
+                                {code:'activity_basketball', label:'Basketball', description:'', example:'', valueCode:'basketball', valueLabel:'Basketball'},
+                                {code:'activity_cycling', label:'Cycling', description:'', example:'', valueCode:'cycling', valueLabel:'Cycling'},
+                                {code:'activity_football', label:'Football', description:'', example:'', valueCode:'football', valueLabel:'Football'},
+                                {code:'activity_golf', label:'Golf', description:'', example:'', valueCode:'golf', valueLabel:'Golf'},
+                                {code:'activity_hiking', label:'Hiking', description:'', example:'', valueCode:'hiking', valueLabel:'Hiking'},
+                                {code:'activity_pickleball', label:'Pickleball', description:'', example:'', valueCode:'pickleball', valueLabel:'Pickleball'},
+                                {code:'activity_running', label:'Running', description:'', example:'', valueCode:'running', valueLabel:'Running'},
+                                {code:'activity_snow_sports', label:'Snow Sports', description:'', example:'', valueCode:'snow-sports', valueLabel:'Snow Sports'},
+                                {code:'activity_soccer', label:'Soccer', description:'', example:'', valueCode:'soccer', valueLabel:'Soccer'},
+                                {code:'activity_tennis', label:'Tennis', description:'', example:'', valueCode:'tennis', valueLabel:'Tennis'},
+                                {code:'activity_trail_running', label:'Trail Running', description:'', example:'', valueCode:'trail-running', valueLabel:'Trail Running'},
+                                {code:'activity_training', label:'Training', description:'', example:'', valueCode:'training', valueLabel:'Training'},
+                                {code:'activity_walking', label:'Walking', description:'', example:'', valueCode:'walking', valueLabel:'Walking'},
+                                {code:'activity_water_sports', label:'Water Sports', description:'', example:'', valueCode:'water-sports', valueLabel:'Water Sports'},
+                                {code:'activity_yoga_and_barre', label:'Yoga & Barre', description:'', example:'', valueCode:'yoga-and-barre', valueLabel:'Yoga & Barre'}
+                            ]},
+                            {code:'age', label:'Age', description:'Indicates the age for which the product is intended. A value other than "no age" is required in all clothing, accessories, and shoes categories.', example:'Adult', children:[
+                                {code:'age_adult', label:'Adult', description:'', example:'', valueCode:'adult', valueLabel:'Adult'},
+                                {code:'age_infant', label:'Infant', description:'', example:'', valueCode:'infant', valueLabel:'Infant'},
+                                {code:'age_no_age', label:'No Age', description:'', example:'', valueCode:'no-age', valueLabel:'No Age'},
+                                {code:'age_teen', label:'Teen', description:'', example:'', valueCode:'teen', valueLabel:'Teen'},
+                                {code:'age_toddler', label:'Toddler', description:'', example:'', valueCode:'toddler', valueLabel:'Toddler'},
+                                {code:'age_youth', label:'Youth', description:'', example:'', valueCode:'youth', valueLabel:'Youth'}
+                            ]},
+                            {code:'age-recommendation-kids-products', label:'Age Recommendation (Kids Products)', description:'Describes recommended target age the product is appropriate for.', example:'Ages 4 and up'},
+                            {code:'application-area', label:'Application Area', description:'Indicates the target use/application area of the beauty product.', example:'Face; Lips'},
+                            {code:'baby-gear-feature', label:'Baby Gear Feature', description:'Indicates specific features of the baby gear product.', example:'Convertible'},
+                            {code:'baby-gear-safety-details', label:'Baby Gear Safety Details', description:'Describes any important safety details of the baby gear product.', example:'Certified by JPMA and meets or exceeds all ASTM safety standards'},
+                            {code:'baby-gear-seat-details', label:'Baby Gear Seat Details', description:'Describes any important details of the seat of the stroller, car seat, or other baby gear product.', example:'Three-position seat recline.'},
+                            {code:'bag-feature', label:'Bag Feature', description:'Indicates specific features of the bag.', example:'Expandable'},
+                            {code:'bag-interior-capacity', label:'Bag Interior Capacity', description:'Indicates the relative capacity of the interior of the bag.', example:'Extra Large'},
+                            {code:'bag-style', label:'Bag Style', description:'Indicates the shape or style of the bag.', example:'Hobo'},
+                            {code:'batteries-included', label:'Batteries Included', description:'Indicates that batteries are included with the product.', example:'Yes'},
+                            {code:'battery-chemistry', label:'Battery Chemistry', description:'Describes the battery chemistry of the batteries included with the product.', example:'Lithium Ion'},
+                            {code:'battery-type', label:'Battery Type', description:'Indicates the type of batteries that are needed to operate the product.', example:'Lithium Ion'},
+                            {code:'beauty-product-packaging-feature', label:'Beauty Product Packaging Feature', description:"Indicates special features or sizes of the beauty product's packaging.", example:'Palette; Refillable'},
+                            {code:'beverage-type', label:'Beverage Type', description:'Indicates the type of beverage the product is or is intended to be used with.', example:'Coffee; Tea'}
+                        ];
+
+                        // state
+                        let currentPage = 1;
+                        let pageSize = 10;
+                        let sortKey = 'code';
+                        let sortDir = 'asc'; // 'asc' or 'desc'
+                        let filterText = '';
+                        // editing state
+                        let editingParent = null; // parent code being edited
+                        let editingChild = null;  // { parentCode, childCode }
+                        const editBuffer = {};    // temporary values while editing
+                        // expanded set keeps track of which parent codes are expanded
+                        const expanded = new Set();
+
+                        // elements
+                        const tbody = document.querySelector('#taxonomyTable tbody');
+                        const searchInput = document.getElementById('searchInput');
+                        const pageSizeSelect = document.getElementById('pageSizeSelect');
+                        const rowsInfo = document.getElementById('rowsInfo');
+                        const pageButtons = document.getElementById('pageButtons');
+                        const firstBtn = document.getElementById('firstBtn');
+                        const prevBtn = document.getElementById('prevBtn');
+                        const nextBtn = document.getElementById('nextBtn');
+                        const lastBtn = document.getElementById('lastBtn');
+
+                        function normalize(s){ return (s||'').toString().toLowerCase(); }
+
+                        function getFilteredSorted(){
+                            const ft = normalize(filterText);
+                            let result = data.filter(r => {
+                                if (!ft) return true;
+                                // parent match
+                                const parentMatch = normalize(r.code).includes(ft) || normalize(r.label).includes(ft) || normalize(r.description).includes(ft) || normalize(r.example).includes(ft);
+                                // child match
+                                const childMatch = Array.isArray(r.children) && r.children.some(c => normalize(c.code).includes(ft) || normalize(c.label).includes(ft) || normalize(c.description).includes(ft) || normalize(c.example).includes(ft) || normalize(c.valueCode || '').includes(ft) || normalize(c.valueLabel || '').includes(ft));
+                                return parentMatch || childMatch;
+                            });
+
+                            result.sort((a,b)=>{
+                                const A = normalize(a[sortKey]);
+                                const B = normalize(b[sortKey]);
+                                if (A < B) return sortDir === 'asc' ? -1 : 1;
+                                if (A > B) return sortDir === 'asc' ? 1 : -1;
+                                return 0;
+                            });
+                            return result;
+                        }
+
+                        function render(){
+                            const filtered = getFilteredSorted();
+                            const total = filtered.length;
+                            const totalPages = Math.max(1, Math.ceil(total / pageSize));
+                            if (currentPage > totalPages) currentPage = totalPages;
+                            const start = (currentPage-1)*pageSize;
+                            const pageItems = filtered.slice(start, start+pageSize);
+
+                            // render rows with caret column and child rows when expanded or filtering matches children
+                            let html = '';
+                            for (const r of pageItems){
+                                const hasChildren = Array.isArray(r.children) && r.children.length > 0;
+                                // determine if should be expanded: explicit user expand OR when filtering and children match
+                                let childMatches = false;
+                                if (hasChildren && filterText){
+                                    const ft = normalize(filterText);
+                                    childMatches = r.children.some(c => normalize(c.code).includes(ft) || normalize(c.label).includes(ft) || normalize(c.description).includes(ft) || normalize(c.example).includes(ft) || normalize(c.valueCode || '').includes(ft) || normalize(c.valueLabel || '').includes(ft));
+                                }
+                                const isExpanded = expanded.has(r.code) || (!!filterText && childMatches);
+
+                                // parent row (build safely without nested template quotes)
+                                // add highlight class if any child matches the filter
+                                const parentClass = childMatches ? 'parent-highlight' : '';
+                                // id used for aria-controls (refers to the first child row for this parent)
+                                const controlId = 'children-' + escapeHtml(r.code);
+                                let parentRow = '<tr data-code="' + escapeHtml(r.code) + '" class="' + parentClass + '">';
+                                parentRow += '<td style="padding:10px; border-top:1px solid #f1f4fb; vertical-align:top;">';
+                                if (hasChildren){
+                                    const btnClass = 'caret-btn' + (isExpanded ? '' : ' caret-collapsed');
+                                    const ariaExpanded = isExpanded ? 'true' : 'false';
+                                    parentRow += '<button class="' + btnClass + '" data-code="' + escapeHtml(r.code) + '" aria-expanded="' + ariaExpanded + '" aria-controls="' + controlId + '" type="button">';
+                                    parentRow += '<span class="caret-icon">' + (isExpanded ? '▼' : '▶') + '</span>';
+                                    parentRow += '</button>';
+                                }
+                                // edit button for parent
+                                parentRow += (hasChildren ? '<button class="edit-parent-btn" data-code="' + escapeHtml(r.code) + '" title="Edit">✎</button>' : '<button class="edit-parent-btn" data-code="' + escapeHtml(r.code) + '" title="Edit">✎</button>');
+                                parentRow += '</td>';
+                                parentRow += '<td>' + escapeHtml(r.code) + '</td>';
+                                // if editing this parent, render inputs for label/description/example
+                                if (editingParent === r.code){
+                                    const buf = editBuffer.parent || { label: r.label, description: r.description, example: r.example };
+                                    parentRow += '<td><input class="edit-input" data-field="label" data-parent="' + escapeHtml(r.code) + '" value="' + escapeHtml(buf.label) + '" /></td>';
+                                    parentRow += '<td><input class="edit-input" data-field="description" data-parent="' + escapeHtml(r.code) + '" value="' + escapeHtml(buf.description) + '" /></td>';
+                                    parentRow += '<td><input class="edit-input" data-field="example" data-parent="' + escapeHtml(r.code) + '" value="' + escapeHtml(buf.example) + '" /></td>';
+                                    // action buttons in last cell
+                                    parentRow += '<td></td>';
+                                    parentRow += '<td><button class="save-parent-btn" data-code="' + escapeHtml(r.code) + '">Save</button> <button class="cancel-parent-btn" data-code="' + escapeHtml(r.code) + '">Cancel</button></td>';
+                                } else {
+                                    parentRow += '<td>' + escapeHtml(r.label) + '</td>';
+                                    parentRow += '<td>' + escapeHtml(r.description) + '</td>';
+                                    parentRow += '<td>' + escapeHtml(r.example) + '</td>';
+                                    // parent rows have no value-code / value-label
+                                    parentRow += '<td></td>';
+                                    parentRow += '<td></td>';
+                                }
+                                parentRow += '</tr>';
+                                html += parentRow;
+
+                                // child rows
+                                if (hasChildren && isExpanded){
+                                    for (let ci = 0; ci < r.children.length; ci++){
+                                        const c = r.children[ci];
+                                        const firstChild = ci === 0;
+                                        // Special rendering for certain parents
+                                        // include data-child attribute so actions can target it
+                                        if (r.code === 'activity'){
+                                            // activity: hide first 4 columns for children
+                                            if (editingChild && editingChild.parentCode === r.code && editingChild.childCode === c.code){
+                                                const buf = editBuffer.child || { valueLabel: c.valueLabel };
+                                                html += '\n<tr class="child-row" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '"' + (firstChild ? ' id="' + controlId + '"' : '') + '>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>' + escapeHtml(c.valueCode || '') + '</td>\n  <td><input class="edit-input" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '" data-field="valueLabel" value="' + escapeHtml(buf.valueLabel) + '" /></td>\n  <td><button class="save-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '">Save</button> <button class="cancel-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '">Cancel</button></td>\n</tr>';
+                                            } else {
+                                                html += '\n<tr class="child-row" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '"' + (firstChild ? ' id="' + controlId + '"' : '') + '>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>' + escapeHtml(c.valueCode || '') + '</td>\n  <td>' + escapeHtml(c.valueLabel || '') + ' <button class="edit-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '" title="Edit">✎</button></td>\n</tr>';
+                                            }
+                                        } else if (r.code === 'age'){
+                                            // age: hide attribute-code and label (columns 2 and 3), keep description/example
+                                            if (editingChild && editingChild.parentCode === r.code && editingChild.childCode === c.code){
+                                                const buf = editBuffer.child || { valueLabel: c.valueLabel };
+                                                html += '\n<tr class="child-row" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '"' + (firstChild ? ' id="' + controlId + '"' : '') + '>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>' + escapeHtml(c.description) + '</td>\n  <td>' + escapeHtml(c.example) + '</td>\n  <td>' + escapeHtml(c.valueCode || '') + '</td>\n  <td><input class="edit-input" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '" data-field="valueLabel" value="' + escapeHtml(buf.valueLabel) + '" /></td>\n  <td><button class="save-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '">Save</button> <button class="cancel-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '">Cancel</button></td>\n</tr>';
+                                            } else {
+                                                html += '\n<tr class="child-row" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '"' + (firstChild ? ' id="' + controlId + '"' : '') + '>\n  <td></td>\n  <td></td>\n  <td></td>\n  <td>' + escapeHtml(c.description) + '</td>\n  <td>' + escapeHtml(c.example) + '</td>\n  <td>' + escapeHtml(c.valueCode || '') + '</td>\n  <td>' + escapeHtml(c.valueLabel || '') + ' <button class="edit-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '" title="Edit">✎</button></td>\n</tr>';
+                                            }
+                                        } else {
+                                            if (editingChild && editingChild.parentCode === r.code && editingChild.childCode === c.code){
+                                                const buf = editBuffer.child || { valueLabel: c.valueLabel };
+                                                html += '\n<tr class="child-row" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '"' + (firstChild ? ' id="' + controlId + '"' : '') + '>\n  <td></td>\n  <td>' + escapeHtml(c.code) + '</td>\n  <td>' + escapeHtml(c.label) + '</td>\n  <td>' + escapeHtml(c.description) + '</td>\n  <td>' + escapeHtml(c.example) + '</td>\n  <td>' + escapeHtml(c.valueCode || '') + '</td>\n  <td><input class="edit-input" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '" data-field="valueLabel" value="' + escapeHtml(buf.valueLabel) + '" /></td>\n  <td><button class="save-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '">Save</button> <button class="cancel-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '">Cancel</button></td>\n</tr>';
+                                            } else {
+                                                html += '\n<tr class="child-row" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '"' + (firstChild ? ' id="' + controlId + '"' : '') + '>\n  <td></td>\n  <td>' + escapeHtml(c.code) + '</td>\n  <td>' + escapeHtml(c.label) + '</td>\n  <td>' + escapeHtml(c.description) + '</td>\n  <td>' + escapeHtml(c.example) + '</td>\n  <td>' + escapeHtml(c.valueCode || '') + '</td>\n  <td>' + escapeHtml(c.valueLabel || '') + ' <button class="edit-child-btn" data-parent="' + escapeHtml(r.code) + '" data-child="' + escapeHtml(c.code) + '" title="Edit">✎</button></td>\n</tr>';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            tbody.innerHTML = html;
+
+                            // rows info
+                            rowsInfo.textContent = `Showing ${start+1}-${start+pageItems.length} of ${total}`;
+
+                            // render page buttons (show up to 7 pages)
+                            pageButtons.innerHTML = '';
+                            const maxButtons = 7;
+                            let startPage = Math.max(1, currentPage - Math.floor(maxButtons/2));
+                            let endPage = Math.min(totalPages, startPage + maxButtons -1);
+                            if (endPage - startPage < maxButtons -1) startPage = Math.max(1, endPage - maxButtons +1);
+                            for(let p=startPage;p<=endPage;p++){
+                                const btn = document.createElement('button');
+                                btn.textContent = p;
+                                btn.style.padding = '6px 10px';
+                                btn.style.borderRadius = '6px';
+                                btn.style.border = p===currentPage ? '2px solid #0066cc' : '1px solid #e0e0e0';
+                                btn.style.background = p===currentPage ? '#eaf3ff' : 'white';
+                                btn.addEventListener('click', ()=>{ currentPage = p; render(); });
+                                pageButtons.appendChild(btn);
+                            }
+
+                            // enable/disable nav
+                            firstBtn.disabled = currentPage === 1;
+                            prevBtn.disabled = currentPage === 1;
+                            nextBtn.disabled = currentPage === totalPages;
+                            lastBtn.disabled = currentPage === totalPages;
+                        }
+
+                        // helpers
+                        function escapeHtml(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+                        // events
+                        searchInput.addEventListener('input', (e)=>{ filterText = e.target.value; currentPage = 1; render(); });
+                        pageSizeSelect.addEventListener('change', (e)=>{ pageSize = parseInt(e.target.value,10); currentPage = 1; render(); });
+                        firstBtn.addEventListener('click', ()=>{ currentPage = 1; render(); });
+                        prevBtn.addEventListener('click', ()=>{ currentPage = Math.max(1, currentPage-1); render(); });
+                        nextBtn.addEventListener('click', ()=>{ currentPage = currentPage+1; render(); });
+                        lastBtn.addEventListener('click', ()=>{ const total = getFilteredSorted().length; currentPage = Math.max(1, Math.ceil(total/pageSize)); render(); });
+
+                        // caret toggle via event delegation on tbody
+                        tbody.addEventListener('click', (ev)=>{
+                            const btn = ev.target.closest('.caret-btn');
+                            if (!btn) return;
+                            const code = btn.getAttribute('data-code');
+                            if (!code) return;
+                            if (expanded.has(code)) expanded.delete(code);
+                            else expanded.add(code);
+                            render();
+                        });
+
+                        // column show/hide handling
+                        const columnControls = document.getElementById('columnControls');
+                        columnControls.addEventListener('change', (ev)=>{
+                            const chk = ev.target.closest('input[type="checkbox"]');
+                            if (!chk) return;
+                            const col = chk.getAttribute('data-col');
+                            toggleColumn(col, chk.checked);
+                        });
+
+                        function toggleColumn(colKey, show){
+                            // find th index for data-col=colKey
+                            const ths = Array.from(document.querySelectorAll('#taxonomyTable thead th'));
+                            let idx = -1;
+                            for (let i=0;i<ths.length;i++){
+                                if (ths[i].getAttribute('data-col') === colKey){ idx = i; break; }
+                            }
+                            if (idx === -1) return;
+                            // toggle th
+                            ths[idx].style.display = show ? '' : 'none';
+                            // toggle tds in both parent and child rows
+                            document.querySelectorAll('#taxonomyTable tbody tr').forEach(tr=>{
+                                const cells = tr.children;
+                                if (cells[idx]) cells[idx].style.display = show ? '' : 'none';
+                            });
+                        }
+
+                        // keyboard handling: Enter = Save, Escape = Cancel while editing
+                        document.addEventListener('keydown', (ev)=>{
+                            if (ev.key === 'Enter'){
+                                // if editing parent
+                                if (editingParent){
+                                    const p = findParent(editingParent);
+                                    const buf = editBuffer.parent || {};
+                                    if (p){ p.label = buf.label; p.description = buf.description; p.example = buf.example; }
+                                    editingParent = null; editBuffer.parent = null; render();
+                                    ev.preventDefault();
+                                } else if (editingChild){
+                                    const cobj = findChild(editingChild.parentCode, editingChild.childCode);
+                                    const buf = editBuffer.child || {};
+                                    if (cobj){ cobj.valueLabel = buf.valueLabel; }
+                                    editingChild = null; editBuffer.child = null; render();
+                                    ev.preventDefault();
+                                }
+                            } else if (ev.key === 'Escape'){
+                                if (editingParent){ editingParent = null; editBuffer.parent = null; render(); ev.preventDefault(); }
+                                else if (editingChild){ editingChild = null; editBuffer.child = null; render(); ev.preventDefault(); }
+                            }
+                        });
+
+                        // edit parent
+                        tbody.addEventListener('click', (ev)=>{
+                            const ep = ev.target.closest('.edit-parent-btn');
+                            if (ep){
+                                const code = ep.getAttribute('data-code');
+                                editingParent = code;
+                                editBuffer.parent = { label: findParent(code).label, description: findParent(code).description, example: findParent(code).example };
+                                render();
+                                return;
+                            }
+                            const sp = ev.target.closest('.save-parent-btn');
+                            if (sp){
+                                const code = sp.getAttribute('data-code');
+                                const buf = editBuffer.parent || {};
+                                const p = findParent(code);
+                                if (p){ p.label = buf.label; p.description = buf.description; p.example = buf.example; }
+                                editingParent = null; editBuffer.parent = null; render();
+                                return;
+                            }
+                            const cp = ev.target.closest('.cancel-parent-btn');
+                            if (cp){ editingParent = null; editBuffer.parent = null; render(); return; }
+
+                            // edit child
+                            const ec = ev.target.closest('.edit-child-btn');
+                            if (ec){
+                                const parent = ec.getAttribute('data-parent');
+                                const child = ec.getAttribute('data-child');
+                                editingChild = { parentCode: parent, childCode: child };
+                                const cobj = findChild(parent, child);
+                                editBuffer.child = { valueLabel: cobj ? cobj.valueLabel : '' };
+                                render();
+                                return;
+                            }
+                            const sc = ev.target.closest('.save-child-btn');
+                            if (sc){
+                                const parent = sc.getAttribute('data-parent');
+                                const child = sc.getAttribute('data-child');
+                                const buf = editBuffer.child || {};
+                                const cobj = findChild(parent, child);
+                                if (cobj){ cobj.valueLabel = buf.valueLabel; }
+                                editingChild = null; editBuffer.child = null; render();
+                                return;
+                            }
+                            const cc = ev.target.closest('.cancel-child-btn');
+                            if (cc){ editingChild = null; editBuffer.child = null; render(); return; }
+                        });
+
+                        // input changes while editing (delegated)
+                        tbody.addEventListener('input', (ev)=>{
+                            const input = ev.target.closest('.edit-input');
+                            if (!input) return;
+                            const field = input.getAttribute('data-field');
+                            const parent = input.getAttribute('data-parent');
+                            const child = input.getAttribute('data-child');
+                            if (child){ // child input
+                                editBuffer.child = editBuffer.child || {};
+                                editBuffer.child[field] = input.value;
+                            } else if (parent){ // parent input
+                                editBuffer.parent = editBuffer.parent || {};
+                                editBuffer.parent[field] = input.value;
+                            }
+                        });
+
+                        // helpers to find parent/child objects
+                        function findParent(code){ return data.find(d=>d.code===code); }
+                        function findChild(parentCode, childCode){ const p = findParent(parentCode); if (!p || !Array.isArray(p.children)) return null; return p.children.find(c=>c.code===childCode); }
+
+                        // summary counts rendering
+                        const summaryPanel = document.getElementById('summaryPanel');
+                        function computeCounts(){
+                            const ft = normalize(filterText);
+                            const counts = data.map(p => {
+                                let count = 0;
+                                if (!Array.isArray(p.children)) count = 0;
+                                else if (!ft) count = p.children.length;
+                                else count = p.children.filter(c => normalize(c.code).includes(ft) || normalize(c.label).includes(ft) || normalize(c.description).includes(ft) || normalize(c.example).includes(ft) || normalize(c.valueCode || '').includes(ft) || normalize(c.valueLabel || '').includes(ft)).length;
+                                return { code: p.code, label: p.label, count };
+                            });
+                            return counts;
+                        }
+
+                        function renderSummary(){
+                            const counts = computeCounts();
+                            let html = '';
+                            for (const s of counts){
+                                html += '<button class="summary-btn" data-code="' + escapeHtml(s.code) + '" style="padding:6px 10px; margin-right:6px; border-radius:6px; border:1px solid #e0e0e0; background:white; cursor:pointer;">' + escapeHtml(s.label) + ' (' + s.count + ')</button>';
+                            }
+                            summaryPanel.innerHTML = html;
+                            // hook clicks
+                            summaryPanel.querySelectorAll('.summary-btn').forEach(b=> b.addEventListener('click', ()=>{
+                                const code = b.getAttribute('data-code');
+                                // expand and scroll to first row for that parent
+                                expanded.add(code);
+                                render();
+                                // after render, scroll to the row
+                                setTimeout(()=>{
+                                    const row = document.querySelector('#taxonomyTable tbody tr[data-code="' + code + '"]');
+                                    if (row) row.scrollIntoView({ behavior:'smooth', block:'center' });
+                                }, 10);
+                            }));
+                        }
+
+
+                        // sorting via headers
+                        document.querySelectorAll('#taxonomyTable thead th').forEach(th=>{
+                            th.addEventListener('click', ()=>{
+                                const key = th.getAttribute('data-key');
+                                if (!key) return;
+                                if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+                                else { sortKey = key; sortDir = 'asc'; }
+                                // update classes
+                                document.querySelectorAll('#taxonomyTable thead th').forEach(h=>{ h.classList.remove('sort-asc','sort-desc'); });
+                                th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+                                currentPage = 1; render();
+                            });
+                        });
+
+                        // initial render
+                        render();
+                    })();
+                </script>
     </div>
 </body>
 </html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Retail Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: #f8f9fa;
+            border-bottom: 2px solid #007bff;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: 60px 200px 120px 100px 120px 120px 120px;
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .header-cell {
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #495057;
+        }
+
+        .header-cell:first-child {
+            justify-content: flex-start;
+        }
+
+        .data-table {
+            background: white;
+        }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 40px 200px 120px 100px 120px 120px 120px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            user-select: none;
+        }
+
+        .data-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-row.dragging {
+            opacity: 0.5;
+            background-color: #e3f2fd;
+            transform: rotate(2deg);
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .data-row.drag-over {
+            border-top: 3px solid #007bff;
+            background-color: #f0f8ff;
+        }
+
+        .data-row.drop-target {
+            border: 2px dashed #007bff;
+            background-color: #f0f8ff;
+        }
+
+        .data-cell {
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #212529;
+        }
+
+        .data-cell:first-child {
+            justify-content: flex-start;
+        }
+
+        .data-cell:not(:first-child):not(:nth-child(2)) {
+            justify-content: center;
+        }
+
+        .expand-toggle {
+            width: 20px;
+            height: 20px;
+			padding: 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #6c757d;
+            transition: all 0.2s;
+            border-radius: 3px;
+        }
+
+        .expand-toggle.expanded {
+            transform: rotate(90deg);
+            background-color: #e3f2fd;
+        }
+
+        .expand-toggle:hover {
+            background-color: #e9ecef;
+        }
+
+        .row-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-0 {
+            font-weight: 700;
+            background-color: #f1f3f5;
+            border-left: 4px solid #007bff;
+        }
+
+        .level-1 {
+            font-weight: 600;
+            background-color: #f8f9fa;
+            border-left: 3px solid #28a745;
+        }
+
+        .level-1 .data-cell:nth-child(2) {
+            padding-left: 60px;
+        }
+
+        .level-2 {
+            font-weight: 500;
+            background-color: #fbfcfd;
+            border-left: 2px solid #ffc107;
+        }
+
+        .level-2 .data-cell:nth-child(2) {
+            padding-left: 60px;
+        }
+
+        .level-3 {
+            background-color: #fdfdfe;
+            border-left: 1px solid #6c757d;
+        }
+
+        .level-3 .data-cell:nth-child(2) {
+            padding-left: 60px;
+        }
+
+        .drag-handle {
+            width: 16px;
+            height: 16px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>') no-repeat center;
+            background-size: contain;
+            cursor: grab;
+            opacity: 0;
+            margin-right: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .data-row:hover .drag-handle {
+            opacity: 0.7;
+        }
+
+        .drag-handle:hover {
+            opacity: 1;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .ship-window-section {
+            margin-top: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .ship-window-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            font-size: 16px;
+            color: #495057;
+        }
+
+        .ship-window-table {
+            background: white;
+        }
+
+        .ship-window-row {
+            display: grid;
+            grid-template-columns: 40px 80px 150px 100px 100px 100px 100px 100px 100px 100px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 12px;
+        }
+
+        .ship-window-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .ship-window-cell {
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            color: #212529;
+        }
+
+        .ship-window-cell:first-child {
+            justify-content: flex-start;
+        }
+
+        .ship-window-cell:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
+            justify-content: center;
+        }
+
+        .delivery-item {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 2px;
+            font-size: 11px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-active { background-color: #28a745; }
+        .status-pending { background-color: #ffc107; }
+        .status-inactive { background-color: #6c757d; }
+
+        .hidden {
+            display: none;
+        }
+
+        .drag-placeholder {
+            background: #e3f2fd;
+            border: 2px dashed #007bff;
+            height: 40px;
+            margin: 2px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007bff;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1200px) {
+            .header-row, .data-row {
+                grid-template-columns: 40px 150px 100px 80px 100px 100px 100px;
+                font-size: 11px;
+            }
+            
+            .ship-window-row {
+                grid-template-columns: 40px 60px 120px 80px 80px 80px 80px 80px 80px 80px;
+            }
+        }
+
+        .summary-badge {
+            background: #007bff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="header-row">
+                <div class="header-cell">------</div>
+                <div class="header-cell">Accepted Items</div>
+                <div class="header-cell">Selected U</div>
+                <div class="header-cell">Neg IMU %</div>
+                <div class="header-cell">Ttl Offer Cost</div>
+                <div class="header-cell">Ttl Neg Cost</div>
+                <div class="header-cell">Ttl Retail</div>
+            </div>
+        </div>
+
+        <div class="data-table" id="dataTable">
+            <!-- Data rows will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <div class="ship-window-section">
+        <div class="ship-window-header">
+            Ship Window Details
+        </div>
+        <div class="ship-window-table" id="shipWindowTable">
+            <!-- Ship window rows will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        class RetailDashboard {
+            constructor() {
+                this.data = this.generateSampleData();
+                this.shipWindowData = this.generateShipWindowData();
+                this.draggedElement = null;
+                this.draggedData = null;
+                this.dropZone = null;
+                this.init();
+            }
+
+            generateSampleData() {
+                return {
+                    id: 'total',
+                    name: 'Total',
+                    level: 0,
+                    expanded: true,
+                    acceptedItems: '34 of 40',
+                    selectedU: '2500 of 2800',
+                    negIMU: '2.15%',
+                    ttlOfferCost: '$45,250.00',
+                    ttlNegCost: '$43,800.00',
+                    ttlRetail: '$48,900.00',
+                    children: [
+                        {
+                            id: 'total-rcom',
+                            name: 'R.com',
+                            level: 1,
+                            acceptedItems: '10',
+                            selectedU: '750',
+                            negIMU: '1.80%',
+                            ttlOfferCost: '$12,500.00',
+                            ttlNegCost: '$12,200.00',
+                            ttlRetail: '$13,100.00'
+                        },
+                        {
+                            id: 'total-stores',
+                            name: 'Stores',
+                            level: 1,
+                            acceptedItems: '15',
+                            selectedU: '1200',
+                            negIMU: '2.25%',
+                            ttlOfferCost: '$22,000.00',
+                            ttlNegCost: '$21,500.00',
+                            ttlRetail: '$23,800.00'
+                        },
+                        {
+                            id: 'total-ph',
+                            name: 'P&H',
+                            level: 1,
+                            acceptedItems: '6',
+                            selectedU: '350',
+                            negIMU: '3.10%',
+                            ttlOfferCost: '$6,750.00',
+                            ttlNegCost: '$6,500.00',
+                            ttlRetail: '$7,200.00'
+                        },
+                        {
+                            id: 'total-new-stores',
+                            name: 'New Stores',
+                            level: 1,
+                            acceptedItems: '3',
+                            selectedU: '200',
+                            negIMU: '1.95%',
+                            ttlOfferCost: '$4,000.00',
+                            ttlNegCost: '$3,600.00',
+                            ttlRetail: '$4,800.00'
+                        },
+                        {
+                            id: 'march',
+                            name: 'March',
+                            level: 1,
+                            expanded: false,
+                            acceptedItems: '34 of 40',
+                            selectedU: '2500 of 2800',
+                            negIMU: '2.15%',
+                            ttlOfferCost: '$45,250.00',
+                            ttlNegCost: '$43,800.00',
+                            ttlRetail: '$48,900.00',
+                            children: [
+                                {
+                                    id: 'march-14',
+                                    name: '14-Mar-2025',
+                                    level: 2,
+                                    expanded: false,
+                                    acceptedItems: '18 of 20',
+                                    selectedU: '1350 of 1400',
+                                    negIMU: '2.05%',
+                                    ttlOfferCost: '$24,600.00',
+                                    ttlNegCost: '$23,900.00',
+                                    ttlRetail: '$26,200.00',
+                                    children: [
+                                        {
+                                            id: 'march-14-rcom',
+                                            name: 'R.com',
+                                            level: 3,
+                                            acceptedItems: '5',
+                                            selectedU: '400',
+                                            negIMU: '1.75%',
+                                            ttlOfferCost: '$6,800.00',
+                                            ttlNegCost: '$6,600.00',
+                                            ttlRetail: '$7,200.00'
+                                        },
+                                        {
+                                            id: 'march-14-stores',
+                                            name: 'Stores',
+                                            level: 3,
+                                            acceptedItems: '8',
+                                            selectedU: '650',
+                                            negIMU: '2.20%',
+                                            ttlOfferCost: '$12,000.00',
+                                            ttlNegCost: '$11,700.00',
+                                            ttlRetail: '$13,000.00'
+                                        },
+                                        {
+                                            id: 'march-14-ph',
+                                            name: 'P&H',
+                                            level: 3,
+                                            acceptedItems: '3',
+                                            selectedU: '180',
+                                            negIMU: '2.90%',
+                                            ttlOfferCost: '$3,600.00',
+                                            ttlNegCost: '$3,400.00',
+                                            ttlRetail: '$3,800.00'
+                                        },
+                                        {
+                                            id: 'march-14-new-stores',
+                                            name: 'New Stores',
+                                            level: 3,
+                                            acceptedItems: '2',
+                                            selectedU: '120',
+                                            negIMU: '1.85%',
+                                            ttlOfferCost: '$2,200.00',
+                                            ttlNegCost: '$2,200.00',
+                                            ttlRetail: '$2,200.00'
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: 'march-29',
+                                    name: '29-Mar-2025',
+                                    level: 2,
+                                    expanded: false,
+                                    acceptedItems: '16 of 20',
+                                    selectedU: '1150 of 1400',
+                                    negIMU: '2.25%',
+                                    ttlOfferCost: '$20,650.00',
+                                    ttlNegCost: '$19,900.00',
+                                    ttlRetail: '$22,700.00',
+                                    children: [
+                                        {
+                                            id: 'march-29-rcom',
+                                            name: 'R.com',
+                                            level: 3,
+                                            acceptedItems: '5',
+                                            selectedU: '350',
+                                            negIMU: '1.85%',
+                                            ttlOfferCost: '$5,700.00',
+                                            ttlNegCost: '$5,600.00',
+                                            ttlRetail: '$5,900.00'
+                                        },
+                                        {
+                                            id: 'march-29-stores',
+                                            name: 'Stores',
+                                            level: 3,
+                                            acceptedItems: '7',
+                                            selectedU: '550',
+                                            negIMU: '2.30%',
+                                            ttlOfferCost: '$10,000.00',
+                                            ttlNegCost: '$9,800.00',
+                                            ttlRetail: '$10,800.00'
+                                        },
+                                        {
+                                            id: 'march-29-ph',
+                                            name: 'P&H',
+                                            level: 3,
+                                            acceptedItems: '3',
+                                            selectedU: '170',
+                                            negIMU: '3.30%',
+                                            ttlOfferCost: '$3,150.00',
+                                            ttlNegCost: '$3,100.00',
+                                            ttlRetail: '$3,400.00'
+                                        },
+                                        {
+                                            id: 'march-29-new-stores',
+                                            name: 'New Stores',
+                                            level: 3,
+                                            acceptedItems: '1',
+                                            selectedU: '80',
+                                            negIMU: '2.05%',
+                                            ttlOfferCost: '$1,800.00',
+                                            ttlNegCost: '$1,400.00',
+                                            ttlRetail: '$2,600.00'
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+            }
+
+            generateShipWindowData() {
+                return [
+                    {
+                        id: 'sw1',
+                        sku: '123',
+                        description: 'SHOES',
+                        color: 'BLACK',
+                        hrf: 'HRF-001',
+                        allocator: 'Auto',
+                        startDate: '3 Dates',
+                        endDate: '3 Dates', 
+                        oteDate: '3 Dates',
+                        month: '2 Months',
+                        distributed: 'Yes',
+                        expanded: false,
+                        deliveries: [
+                            { date: '10-Sep-2025', details: '10-Sep-2025', ote: '15-Sep-2025', month: 'SEPTEMBER', status: 'active' },
+                            { date: '17-Sep-2025', details: '17-Sep-2025', ote: '25-Sep-2025', month: 'SEPTEMBER', status: 'pending' },
+                            { date: '05-Oct-2025', details: '05-Oct-2025', ote: '12-Oct-2025', month: 'OCTOBER', status: 'active' }
+                        ]
+                    },
+                    {
+                        id: 'sw2',
+                        sku: '124',
+                        description: 'SHOES',
+                        color: 'WHITE',
+                        hrf: 'HRF-002',
+                        allocator: 'Manual',
+                        startDate: '2 Dates',
+                        endDate: '2 Dates',
+                        oteDate: '2 Dates',
+                        month: '1 Month',
+                        distributed: 'No',
+                        expanded: false,
+                        deliveries: [
+                            { date: '14-Sep-2025', details: '14-Sep-2025', ote: '20-Sep-2025', month: 'SEPTEMBER', status: 'active' },
+                            { date: '28-Sep-2025', details: '28-Sep-2025', ote: '04-Oct-2025', month: 'OCTOBER', status: 'inactive' }
+                        ]
+                    },
+                    {
+                        id: 'sw3',
+                        sku: '125',
+                        description: 'SHOES',
+                        color: 'RED',
+                        hrf: 'HRF-003',
+                        allocator: 'Auto',
+                        startDate: '4 Dates',
+                        endDate: '4 Dates',
+                        oteDate: '4 Dates',
+                        month: '2 Months',
+                        distributed: 'Partial',
+                        expanded: false,
+                        deliveries: [
+                            { date: '12-Sep-2025', details: '12-Sep-2025', ote: '18-Sep-2025', month: 'SEPTEMBER', status: 'pending' },
+                            { date: '20-Sep-2025', details: '20-Sep-2025', ote: '26-Sep-2025', month: 'SEPTEMBER', status: 'active' },
+                            { date: '03-Oct-2025', details: '03-Oct-2025', ote: '09-Oct-2025', month: 'OCTOBER', status: 'active' },
+                            { date: '17-Oct-2025', details: '17-Oct-2025', ote: '23-Oct-2025', month: 'OCTOBER', status: 'pending' }
+                        ]
+                    }
+                ];
+            }
+
+            init() {
+                this.renderDataTable();
+                this.renderShipWindowTable();
+                this.attachEventListeners();
+            }
+
+            renderDataTable() {
+                const tableContainer = document.getElementById('dataTable');
+                tableContainer.innerHTML = '';
+                this.renderNode(this.data, tableContainer);
+            }
+
+            renderNode(node, container, parentPath = '', parentNode = null) {
+                const row = this.createDataRow(node, parentPath, parentNode);
+                container.appendChild(row);
+
+                if (node.children && node.expanded) {
+                    node.children.forEach((child, index) => {
+                        this.renderNode(child, container, `${parentPath}-${index}`, node);
+                    });
+                }
+            }
+
+            createDataRow(node, path, parentNode) {
+                const row = document.createElement('div');
+                row.className = `data-row level-${node.level}`;
+                row.draggable = true;
+                row.dataset.nodeId = node.id;
+                row.dataset.path = path;
+                row.dataset.level = node.level;
+
+                const hasChildren = node.children && node.children.length > 0;
+                const expandIcon = hasChildren ? (node.expanded ? ' ▼ ' : ' ▶ ') : '';
+
+                // Add summary badge for parent nodes
+                const summaryBadge = hasChildren ? `<span class="summary-badge">${node.children.length}</span>` : '';
+
+                row.innerHTML = `
+                    <div class="data-cell">
+                        <div class="row-content">
+                            <div class="drag-handle"></div>
+                            <button class="expand-toggle ${node.expanded ? 'expanded' : ''}" 
+                                    ${!hasChildren ? 'style="visibility: hidden;"' : ''}>
+                                ${expandIcon}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="data-cell">${node.name}${summaryBadge}</div>
+                    <div class="data-cell">${node.selectedU}</div>
+                    <div class="data-cell">${node.negIMU}</div>
+                    <div class="data-cell">${node.ttlOfferCost}</div>
+                    <div class="data-cell">${node.ttlNegCost}</div>
+                    <div class="data-cell">${node.ttlRetail}</div>
+                `;
+
+                return row;
+            }
+
+            renderShipWindowTable() {
+                const container = document.getElementById('shipWindowTable');
+                container.innerHTML = `
+                    <div class="ship-window-row" style="background: #f8f9fa; font-weight: 600;">
+                        <div class="ship-window-cell"></div>
+                        <div class="ship-window-cell">UPC</div>
+                        <div class="ship-window-cell">VPN Description</div>
+                        <div class="ship-window-cell">Supplier Color</div>
+                        <div class="ship-window-cell">HRF CC</div>
+                        <div class="ship-window-cell">Needs Allocator</div>
+                        <div class="ship-window-cell">Start Ship Date</div>
+                        <div class="ship-window-cell">End Ship Date</div>
+                        <div class="ship-window-cell">OTE EOW Date</div>
+                        <div class="ship-window-cell">Month</div>
+                    </div>
+                `;
+
+                this.shipWindowData.forEach(item => {
+                    const row = this.createShipWindowRow(item);
+                    container.appendChild(row);
+
+                    if (item.expanded && item.deliveries) {
+                        item.deliveries.forEach(delivery => {
+                            const deliveryRow = this.createDeliveryRow(delivery);
+                            container.appendChild(deliveryRow);
+                        });
+                    }
+                });
+            }
+
+            createShipWindowRow(item) {
+                const row = document.createElement('div');
+                row.className = 'ship-window-row';
+                row.dataset.itemId = item.id;
+
+                const hasDeliveries = item.deliveries && item.deliveries.length > 0;
+                const expandIcon = hasDeliveries ? (item.expanded ? ' ▼ ' : ' ▶ ') : '';
+
+                row.innerHTML = `
+                    <div class="ship-window-cell">
+                        <button class="expand-toggle ${item.expanded ? 'expanded' : ''}"
+                                ${!hasDeliveries ? 'style="visibility: hidden;"' : ''}>
+                            ${expandIcon}
+                        </button>
+                    </div>
+                    <div class="ship-window-cell">${item.sku}</div>
+                    <div class="ship-window-cell">${item.description}</div>
+                    <div class="ship-window-cell">${item.color}</div>
+                    <div class="ship-window-cell">${item.hrf}</div>
+                    <div class="ship-window-cell">${item.allocator}</div>
+                    <div class="ship-window-cell">${item.startDate}</div>
+                    <div class="ship-window-cell">${item.endDate}</div>
+                    <div class="ship-window-cell">${item.oteDate}</div>
+                    <div class="ship-window-cell">${item.month}</div>
+                `;
+
+                return row;
+            }
+
+            createDeliveryRow(delivery) {
+                const row = document.createElement('div');
+                row.className = 'ship-window-row';
+                row.style.paddingLeft = '40px';
+                row.style.backgroundColor = '#f9f9f9';
+
+                row.innerHTML = `
+                    <div class="ship-window-cell">
+                        <div class="status-indicator status-${delivery.status}"></div>
+                    </div>
+                    <div class="ship-window-cell"></div>
+                    <div class="ship-window-cell">
+                        <div class="delivery-item">${delivery.date}</div>
+                    </div>
+                    <div class="ship-window-cell">${delivery.details}</div>
+                    <div class="ship-window-cell"></div>
+                    <div class="ship-window-cell"></div>
+                    <div class="ship-window-cell">${delivery.date}</div>
+                    <div class="ship-window-cell">${delivery.details}</div>
+                    <div class="ship-window-cell">${delivery.ote}</div>
+                    <div class="ship-window-cell">${delivery.month}</div>
+                `;
+
+                return row;
+            }
+
+            attachEventListeners() {
+                // Expand/Collapse functionality
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('expand-toggle')) {
+                        e.stopPropagation();
+                        
+                        if (e.target.closest('.ship-window-row')) {
+                            this.toggleShipWindow(e.target);
+                        } else {
+                            this.toggleExpand(e.target);
+                        }
+                    }
+                });
+
+                // Enhanced Drag and Drop functionality
+                document.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('data-row')) {
+                        this.draggedElement = e.target;
+                        this.draggedData = {
+                            nodeId: e.target.dataset.nodeId,
+                            level: parseInt(e.target.dataset.level),
+                            path: e.target.dataset.path
+                        };
+                        e.target.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        
+                        // Create drag image
+                        const dragImage = e.target.cloneNode(true);
+                        dragImage.style.transform = 'rotate(2deg)';
+                        dragImage.style.opacity = '0.8';
+                        document.body.appendChild(dragImage);
+                        e.dataTransfer.setDragImage(dragImage, 0, 0);
+                        setTimeout(() => document.body.removeChild(dragImage), 0);
+                    }
+                });
+
+                document.addEventListener('dragend', (e) => {
+                    if (e.target.classList.contains('data-row')) {
+                        e.target.classList.remove('dragging');
+                        document.querySelectorAll('.drag-over, .drop-target').forEach(el => {
+                            el.classList.remove('drag-over', 'drop-target');
+                        });
+                        this.draggedElement = null;
+                        this.draggedData = null;
+                        this.dropZone = null;
+                    }
+                });
+
+                document.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (this.draggedElement && e.target.closest('.data-row')) {
+                        const targetRow = e.target.closest('.data-row');
+                        const targetLevel = parseInt(targetRow.dataset.level);
+                        
+                        if (targetRow !== this.draggedElement) {
+                            // Remove previous highlights
+                            document.querySelectorAll('.drag-over, .drop-target').forEach(el => {
+                                el.classList.remove('drag-over', 'drop-target');
+                            });
+                            
+                            // Only allow reordering within same level or valid parent-child relationships
+                            if (this.canDropHere(targetLevel, this.draggedData.level)) {
+                                targetRow.classList.add('drop-target');
+                                this.dropZone = targetRow;
+                            }
+                        }
+                    }
+                });
+
+                document.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (this.draggedElement && this.dropZone) {
+                        this.handleDrop(this.dropZone);
+                    }
+                });
+
+                // Prevent default drag behavior on drag handles
+                document.addEventListener('mousedown', (e) => {
+                    if (e.target.classList.contains('drag-handle')) {
+                        e.target.closest('.data-row').draggable = true;
+                    }
+                });
+            }
+
+            canDropHere(targetLevel, draggedLevel) {
+                // Allow dropping on same level (reordering)
+                if (targetLevel === draggedLevel) return true;
+                
+                // Allow dropping child into parent (level difference of 1)
+                if (targetLevel === draggedLevel - 1) return true;
+                
+                return false;
+            }
+
+            toggleExpand(button) {
+                const row = button.closest('.data-row');
+                const nodeId = row.dataset.nodeId;
+                
+                const node = this.findNodeById(this.data, nodeId);
+                if (node && node.children) {
+                    node.expanded = !node.expanded;
+                    this.renderDataTable();
+                }
+            }
+
+            toggleShipWindow(button) {
+                const row = button.closest('.ship-window-row');
+                const itemId = row.dataset.itemId;
+                
+                const item = this.shipWindowData.find(item => item.id === itemId);
+                if (item && item.deliveries) {
+                    item.expanded = !item.expanded;
+                    this.renderShipWindowTable();
+                }
+            }
+
+            handleDrop(targetRow) {
+                const container = targetRow.parentNode;
+                const draggedIndex = Array.from(container.children).indexOf(this.draggedElement);
+                const targetIndex = Array.from(container.children).indexOf(targetRow);
+                
+                // Perform the DOM reordering
+                if (draggedIndex < targetIndex) {
+                    container.insertBefore(this.draggedElement, targetRow.nextSibling);
+                } else {
+                    container.insertBefore(this.draggedElement, targetRow);
+                }
+                
+                // Update the data structure to reflect the new order
+                this.updateDataOrder(this.draggedData.nodeId, targetRow.dataset.nodeId);
+                
+                // Show success feedback
+                this.showDropFeedback(targetRow);
+            }
+
+            updateDataOrder(draggedNodeId, targetNodeId) {
+                // Find and update the order in the data structure
+                // This is a simplified version - in a real app, you'd want more sophisticated reordering logic
+                console.log(`Moved ${draggedNodeId} relative to ${targetNodeId}`);
+            }
+
+            showDropFeedback(targetRow) {
+                // Visual feedback for successful drop
+                targetRow.style.background = '#d4edda';
+                targetRow.style.borderColor = '#28a745';
+                
+                setTimeout(() => {
+                    targetRow.style.background = '';
+                    targetRow.style.borderColor = '';
+                }, 1000);
+            }
+
+            findNodeById(node, id) {
+                if (node.id === id) return node;
+                if (node.children) {
+                    for (const child of node.children) {
+                        const found = this.findNodeById(child, id);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+
+            // Utility method to get all nodes at a specific level
+            getNodesAtLevel(level) {
+                const nodes = [];
+                
+                const traverse = (node) => {
+                    if (node.level === level) {
+                        nodes.push(node);
+                    }
+                    if (node.children) {
+                        node.children.forEach(traverse);
+                    }
+                };
+                
+                traverse(this.data);
+                return nodes;
+            }
+
+            // Method to expand all nodes
+            expandAll() {
+                const expandNode = (node) => {
+                    if (node.children) {
+                        node.expanded = true;
+                        node.children.forEach(expandNode);
+                    }
+                };
+                expandNode(this.data);
+                this.renderDataTable();
+            }
+
+            // Method to collapse all nodes
+            collapseAll() {
+                const collapseNode = (node) => {
+                    if (node.children) {
+                        node.expanded = false;
+                        node.children.forEach(collapseNode);
+                    }
+                };
+                collapseNode(this.data);
+                this.renderDataTable();
+            }
+        }
+
+        // Initialize the dashboard when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new RetailDashboard();
+            
+            // Add some global controls for testing
+            console.log('Dashboard loaded. Try these commands:');
+            console.log('dashboard.expandAll() - Expand all nodes');
+            console.log('dashboard.collapseAll() - Collapse all nodes');
+        });
+    </script>
+</body>
+</html>

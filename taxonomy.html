@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta chars                       <!-- column visibility controls -->              <!-- column visibility controls -->              <!-- column visibility controls -->           <!-- summary counts + column visibility controls -->
+                    <div id="summaryPanel" style="display:none; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+                        <!-- populated by JS -->
+                    </div>UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taxonomy</title>
+    <title>Taxonomy--</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; color: #333; }
@@ -46,13 +49,19 @@
                 <div style="margin-top:20px;">
                     <h2 style="font-size:16px; margin-bottom:8px;">Attribute Taxonomy</h2>
 
+                    <!-- action buttons -->
+                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                        <button id="addAttributeBtn" style="padding:8px 12px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer;">+ Add Attribute</button>
+                        <button id="deleteSelectedBtn" style="padding:8px 12px; background:#dc3545; color:white; border:none; border-radius:6px; cursor:pointer;" disabled>Delete Selected</button>
+                    </div>
+
                     <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
                         <input id="searchInput" type="search" placeholder="Search attribute, label, description or example..." style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:6px;" />
                     </div>
 
                     <!-- summary counts + column visibility controls -->
                     <div id="summaryPanel" style="display:flex; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
-                        <!-- populated by JS -->
+                        <!-- populated by JS   -->
                     </div>
 
                     <!-- column visibility controls -->
@@ -108,6 +117,68 @@
                                 </div>
                 </div>
 
+                <!-- modals -->
+                <div id="addAttributeModal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add New Attribute</h3>
+                            <span class="close" data-modal="addAttributeModal">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div style="margin-bottom:12px;">
+                                <label>Attribute Code:</label>
+                                <input id="newAttrCode" type="text" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px;" />
+                            </div>
+                            <div style="margin-bottom:12px;">
+                                <label>Label:</label>
+                                <input id="newAttrLabel" type="text" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px;" />
+                            </div>
+                            <div style="margin-bottom:12px;">
+                                <label>Description:</label>
+                                <textarea id="newAttrDescription" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px; min-height:60px;"></textarea>
+                            </div>
+                            <div style="margin-bottom:12px;">
+                                <label>Example:</label>
+                                <input id="newAttrExample" type="text" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px;" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="saveNewAttribute" style="padding:8px 16px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">Save</button>
+                            <button class="close" data-modal="addAttributeModal" style="padding:8px 16px; background:#6c757d; color:white; border:none; border-radius:4px; cursor:pointer;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="addChildModal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add Child Value</h3>
+                            <span class="close" data-modal="addChildModal">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div style="margin-bottom:12px;">
+                                <label>Parent: <span id="childParentLabel"></span></label>
+                            </div>
+                            <div style="margin-bottom:12px;">
+                                <label>Child Code:</label>
+                                <input id="newChildCode" type="text" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px;" />
+                            </div>
+                            <div style="margin-bottom:12px;">
+                                <label>Value Code:</label>
+                                <input id="newChildValueCode" type="text" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px;" />
+                            </div>
+                            <div style="margin-bottom:12px;">
+                                <label>Value Label:</label>
+                                <input id="newChildValueLabel" type="text" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ddd; border-radius:4px;" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="saveNewChild" style="padding:8px 16px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">Save</button>
+                            <button class="close" data-modal="addChildModal" style="padding:8px 16px; background:#6c757d; color:white; border:none; border-radius:4px; cursor:pointer;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
                 <style>
                     /* small table helpers */
                     #taxonomyTable tbody tr:nth-child(even) { background:#fbfdff; }
@@ -125,6 +196,17 @@
                     .edit-parent-btn, .edit-child-btn { background:transparent; border:none; cursor:pointer; margin-left:8px; color:#0066cc; }
                     .edit-input { padding:6px 8px; border:1px solid #dcdfe8; border-radius:6px; font-size:13px; width:100%; box-sizing:border-box; }
                     .save-parent-btn, .cancel-parent-btn, .save-child-btn, .cancel-child-btn { padding:6px 8px; margin-left:6px; border-radius:6px; border:1px solid #d0d7e6; background:white; cursor:pointer; }
+                    /* delete and modal styles */
+                    .delete-btn, .add-child-btn { background:transparent; border:none; cursor:pointer; margin-left:8px; color:#dc3545; }
+                    .row-checkbox { margin-right:8px; }
+                    .modal { position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+                    .modal-content { background:white; margin:15% auto; padding:0; border-radius:8px; width:90%; max-width:500px; }
+                    .modal-header { padding:16px 20px; border-bottom:1px solid #e9ecef; display:flex; justify-content:space-between; align-items:center; }
+                    .modal-header h3 { margin:0; }
+                    .modal-body { padding:20px; }
+                    .modal-footer { padding:16px 20px; border-top:1px solid #e9ecef; display:flex; gap:8px; justify-content:flex-end; }
+                    .close { color:#aaa; font-size:28px; font-weight:bold; cursor:pointer; }
+                    .close:hover { color:#000; }
                 </style>
 
                 <script>
@@ -247,6 +329,8 @@
                                 const controlId = 'children-' + escapeHtml(r.code);
                                 let parentRow = '<tr data-code="' + escapeHtml(r.code) + '" class="' + parentClass + '">';
                                 parentRow += '<td style="padding:10px; border-top:1px solid #f1f4fb; vertical-align:top;">';
+                                // checkbox for selection
+                                parentRow += '<input type="checkbox" class="row-checkbox" data-code="' + escapeHtml(r.code) + '" />';
                                 if (hasChildren){
                                     const btnClass = 'caret-btn' + (isExpanded ? '' : ' caret-collapsed');
                                     const ariaExpanded = isExpanded ? 'true' : 'false';
@@ -254,8 +338,10 @@
                                     parentRow += '<span class="caret-icon">' + (isExpanded ? '▼' : '▶') + '</span>';
                                     parentRow += '</button>';
                                 }
-                                // edit button for parent
-                                parentRow += (hasChildren ? '<button class="edit-parent-btn" data-code="' + escapeHtml(r.code) + '" title="Edit">✎</button>' : '<button class="edit-parent-btn" data-code="' + escapeHtml(r.code) + '" title="Edit">✎</button>');
+                                // action buttons for parent
+                                parentRow += '<button class="edit-parent-btn" data-code="' + escapeHtml(r.code) + '" title="Edit">✎</button>';
+                                parentRow += '<button class="delete-btn" data-code="' + escapeHtml(r.code) + '" title="Delete">🗑</button>';
+                                if (hasChildren) parentRow += '<button class="add-child-btn" data-code="' + escapeHtml(r.code) + '" title="Add Child">+</button>';
                                 parentRow += '</td>';
                                 parentRow += '<td>' + escapeHtml(r.code) + '</td>';
                                 // if editing this parent, render inputs for label/description/example
@@ -479,42 +565,6 @@
                         function findParent(code){ return data.find(d=>d.code===code); }
                         function findChild(parentCode, childCode){ const p = findParent(parentCode); if (!p || !Array.isArray(p.children)) return null; return p.children.find(c=>c.code===childCode); }
 
-                        // summary counts rendering
-                        const summaryPanel = document.getElementById('summaryPanel');
-                        function computeCounts(){
-                            const ft = normalize(filterText);
-                            const counts = data.map(p => {
-                                let count = 0;
-                                if (!Array.isArray(p.children)) count = 0;
-                                else if (!ft) count = p.children.length;
-                                else count = p.children.filter(c => normalize(c.code).includes(ft) || normalize(c.label).includes(ft) || normalize(c.description).includes(ft) || normalize(c.example).includes(ft) || normalize(c.valueCode || '').includes(ft) || normalize(c.valueLabel || '').includes(ft)).length;
-                                return { code: p.code, label: p.label, count };
-                            });
-                            return counts;
-                        }
-
-                        function renderSummary(){
-                            const counts = computeCounts();
-                            let html = '';
-                            for (const s of counts){
-                                html += '<button class="summary-btn" data-code="' + escapeHtml(s.code) + '" style="padding:6px 10px; margin-right:6px; border-radius:6px; border:1px solid #e0e0e0; background:white; cursor:pointer;">' + escapeHtml(s.label) + ' (' + s.count + ')</button>';
-                            }
-                            summaryPanel.innerHTML = html;
-                            // hook clicks
-                            summaryPanel.querySelectorAll('.summary-btn').forEach(b=> b.addEventListener('click', ()=>{
-                                const code = b.getAttribute('data-code');
-                                // expand and scroll to first row for that parent
-                                expanded.add(code);
-                                render();
-                                // after render, scroll to the row
-                                setTimeout(()=>{
-                                    const row = document.querySelector('#taxonomyTable tbody tr[data-code="' + code + '"]');
-                                    if (row) row.scrollIntoView({ behavior:'smooth', block:'center' });
-                                }, 10);
-                            }));
-                        }
-
-
                         // sorting via headers
                         document.querySelectorAll('#taxonomyTable thead th').forEach(th=>{
                             th.addEventListener('click', ()=>{
@@ -529,6 +579,154 @@
                             });
                         });
 
+                        // add/delete functionality
+                        let addingChildFor = null;
+                        
+                        // modal management
+                        function showModal(modalId) {
+                            document.getElementById(modalId).style.display = 'block';
+                        }
+                        function hideModal(modalId) {
+                            document.getElementById(modalId).style.display = 'none';
+                        }
+                        
+                        // close modal handlers
+                        document.querySelectorAll('.close').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                const modal = e.target.getAttribute('data-modal');
+                                if (modal) hideModal(modal);
+                            });
+                        });
+                        
+                        // click outside modal to close
+                        document.addEventListener('click', (e) => {
+                            if (e.target.classList.contains('modal')) {
+                                e.target.style.display = 'none';
+                            }
+                        });
+                        
+                        // add attribute button
+                        document.getElementById('addAttributeBtn').addEventListener('click', () => {
+                            // clear form
+                            document.getElementById('newAttrCode').value = '';
+                            document.getElementById('newAttrLabel').value = '';
+                            document.getElementById('newAttrDescription').value = '';
+                            document.getElementById('newAttrExample').value = '';
+                            showModal('addAttributeModal');
+                        });
+                        
+                        // save new attribute
+                        document.getElementById('saveNewAttribute').addEventListener('click', () => {
+                            const code = document.getElementById('newAttrCode').value.trim();
+                            const label = document.getElementById('newAttrLabel').value.trim();
+                            const description = document.getElementById('newAttrDescription').value.trim();
+                            const example = document.getElementById('newAttrExample').value.trim();
+                            
+                            if (!code || !label) {
+                                alert('Code and Label are required');
+                                return;
+                            }
+                            
+                            // check if code already exists
+                            if (data.find(d => d.code === code)) {
+                                alert('Attribute code already exists');
+                                return;
+                            }
+                            
+                            data.push({ code, label, description, example, children: [] });
+                            hideModal('addAttributeModal');
+                            render();
+                        });
+                        
+                        // checkbox change handler for delete button state
+                        tbody.addEventListener('change', (e) => {
+                            if (e.target.classList.contains('row-checkbox')) {
+                                const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                                document.getElementById('deleteSelectedBtn').disabled = checkedBoxes.length === 0;
+                            }
+                        });
+                        
+                        // delete selected button
+                        document.getElementById('deleteSelectedBtn').addEventListener('click', () => {
+                            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                            const codes = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-code'));
+                            
+                            if (codes.length === 0) return;
+                            
+                            if (confirm(`Delete ${codes.length} attribute(s)? This cannot be undone.`)) {
+                                codes.forEach(code => {
+                                    const index = data.findIndex(d => d.code === code);
+                                    if (index > -1) data.splice(index, 1);
+                                });
+                                render();
+                            }
+                        });
+                        
+                        // individual delete and add child buttons
+                        tbody.addEventListener('click', (e) => {
+                            const deleteBtn = e.target.closest('.delete-btn');
+                            if (deleteBtn) {
+                                const code = deleteBtn.getAttribute('data-code');
+                                const attr = data.find(d => d.code === code);
+                                if (attr && confirm(`Delete attribute "${attr.label}"? This cannot be undone.`)) {
+                                    const index = data.findIndex(d => d.code === code);
+                                    if (index > -1) data.splice(index, 1);
+                                    render();
+                                }
+                                return;
+                            }
+                            
+                            const addChildBtn = e.target.closest('.add-child-btn');
+                            if (addChildBtn) {
+                                const code = addChildBtn.getAttribute('data-code');
+                                const attr = data.find(d => d.code === code);
+                                if (attr) {
+                                    addingChildFor = code;
+                                    document.getElementById('childParentLabel').textContent = attr.label;
+                                    document.getElementById('newChildCode').value = '';
+                                    document.getElementById('newChildValueCode').value = '';
+                                    document.getElementById('newChildValueLabel').value = '';
+                                    showModal('addChildModal');
+                                }
+                                return;
+                            }
+                        });
+                        
+                        // save new child
+                        document.getElementById('saveNewChild').addEventListener('click', () => {
+                            const code = document.getElementById('newChildCode').value.trim();
+                            const valueCode = document.getElementById('newChildValueCode').value.trim();
+                            const valueLabel = document.getElementById('newChildValueLabel').value.trim();
+                            
+                            if (!code || !valueLabel) {
+                                alert('Child Code and Value Label are required');
+                                return;
+                            }
+                            
+                            const parent = data.find(d => d.code === addingChildFor);
+                            if (parent) {
+                                if (!Array.isArray(parent.children)) parent.children = [];
+                                
+                                // check if child code already exists
+                                if (parent.children.find(c => c.code === code)) {
+                                    alert('Child code already exists for this attribute');
+                                    return;
+                                }
+                                
+                                parent.children.push({
+                                    code,
+                                    label: valueLabel,
+                                    description: '',
+                                    example: '',
+                                    valueCode,
+                                    valueLabel
+                                });
+                            }
+                            
+                            hideModal('addChildModal');
+                            render();
+                        });
+                        
                         // initial render
                         render();
                     })();

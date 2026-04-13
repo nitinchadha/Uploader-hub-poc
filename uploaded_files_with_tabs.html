@@ -526,25 +526,82 @@
                 padding: 4px 0;
             }
         }
+         .breadcrumb {
+            background: white;
+            padding: 12px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+        .breadcrumb--inline {
+            background: none;
+            border-bottom: none;
+            padding: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .breadcrumb-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .breadcrumb-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .breadcrumb-nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+         .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+         .retail-hub {
+            color: #4285f4;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <button class="back-btn" onclick="goBack()">
-                ← Back to Dashboard
-            </button>
-        </div>
-        <div class="header-actions">
-            <a href="#" class="btn-outline">Download Template</a>
-            <a href="#" class="btn-primary" onclick="goToUploader()">Upload Files</a>
-        </div>
+<header class="header">
+    <div class="logo-section">
+        <div class="logo">NORDSTROM</div>
+        <div class="retail-hub"><a href="index.html">RETAIL HUB</a></div>
     </div>
+    <div class="header-actions">
+        <span>🔔</span>
+        <span>❓</span>
+        <span>⋮</span>
+        <span>👤</span>
+    </div>
+</header>
+
+
+    <nav class="sub-header breadcrumb-nav-bar">
+        <div class="breadcrumb-nav-left">
+            <div class="breadcrumb breadcrumb--inline">
+                ≡ <a href="index.html">Retail hub</a> | <b>Uploaded Files</b>
+            </div>
+        </div>
+        <div class="header-actions breadcrumb-nav-actions">
+            <a href="#" class="btn-outline">Download Template</a>
+            <a href="uploader-hub.html" class="btn-primary">Upload Files</a>
+        </div>
+    </nav>
 
     <div class="container">
         <div class="page-header">
-            <h1 class="page-title">Uploaded Files</h1>
-            <p class="page-subtitle">Manage and monitor all uploaded Excel files and their processing status</p>
             
             <div class="stats-bar">
                 <span class="stats-text" id="statsText">Total Files: 24 | Processing: 3 | Completed: 18 | Failed: 2 | Pending: 1</span>
